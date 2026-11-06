@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4057 — Explore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../">
+  <header class="nav">
+    <a class="logo" href="../index.html" aria-label="4057 home"><img class="logo-light" src="../images/logo-white.webp" alt="4057" width="78" height="26"><img class="logo-dark" src="../images/logo-black.webp" alt="" width="78" height="26"></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="explore.html" aria-current="page">Explore</a>
+      <a href="map.html">Map</a>
+      <a href="about.html">About</a>
+      <button class="sound-btn" type="button" aria-pressed="false" aria-label="Toggle sound">
+        <img class="snd-on" src="../images/sound-on.webp" alt="" aria-hidden="true">
+        <img class="snd-off" src="../images/sound-off.webp" alt="" aria-hidden="true">
+      </button>
+    </nav>
+  </header>
+
+  <main class="experience" id="experience">
+    <div class="stage">
+      <canvas id="frames" aria-hidden="true"></canvas>
+      <div class="fog" id="fog"></div>
+
+      <!-- Each block's data-scene must match an id in SCENES (js/explore.js) -->
+      <div class="copy intro" data-scene="intro">
+        <span class="scroll-icon" aria-hidden="true"></span>
+        <div class="text">
+          <h1 class="title">Scroll to start</h1>
+          <p class="body">This is a scroll/drag-down experience that moves forwards when you scroll, to move back, simply do the opposite</p>
+        </div>
+      </div>
+
+      <div class="copy right" data-scene="welcome">
+        <h2 class="title">Welcome</h2>
+        <p class="body">We welcome you to 4057, it has been some time, but we remember you. Experience the future far beyond, or maybe it is sooner than you realise</p>
+      </div>
+
+      <div class="copy left" data-scene="drawer">
+        <h2 class="title">Open up</h2>
+        <p class="body">What people once thought was just a draw of trash, was much more than that, it was the very beginning, of the end</p>
+      </div>
+
+      <div class="copy right" data-scene="pie">
+        <h2 class="title">Eat your fill</h2>
+        <p class="body">The toxic chemicals have infiltrated your dinner, are you excited, disgusted? well, we would not know, we cant eat after all</p>
+      </div>
+
+      <div class="copy left" data-scene="boardwalk">
+        <h2 class="title">Take a stroll</h2>
+        <p class="body">Fitness is important for the human body, the sun is out, try not to get burned. Current temperature: 45 degrees</p>
+      </div>
+
+      <div class="copy right" data-scene="pilotbay">
+        <h2 class="title">Dive in</h2>
+        <p class="body">Currently, the amount of marine life found in the ocean is at 20% compared to what It used to be</p>
+      </div>
+
+      <div class="copy left" data-scene="mauao">
+        <h2 class="title">Mt Maunganui</h2>
+        <p class="body">Will you climb to the top, can you? Probability of injury during climb is 85%</p>
+      </div>
+
+      <div class="copy center end-copy" data-scene="end">
+        <h2 class="title">Uncover the hidden in your home</h2>
+        <p class="body">Make the right changes before that drawer goes beyond your reach. Visit the map to see the local businesses addressing the issue.</p>
+        <a class="btn" href="map.html">Visit</a>
+      </div>
+
+      <div class="progress" id="progress"></div>
+    </div>
+  </main>
+
+  <audio id="ambient" src="../audio/4057-soundtrack.m4a" loop preload="none"></audio>
+  <script src="../js/script.js"></script>
+  <script src="../js/explore.js"></script>
+</body>
+</html>

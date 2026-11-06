@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4057 — About</title>
+  <meta name="description" content="Our story, mission and values, plus how to contact the 4057 team about e-waste in Tauranga.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../">
+  <header class="nav">
+    <a class="logo" href="../index.html" aria-label="4057 home"><img class="logo-light" src="../images/logo-white.webp" alt="4057" width="78" height="26"><img class="logo-dark" src="../images/logo-black.webp" alt="" width="78" height="26"></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="explore.html">Explore</a>
+      <a href="map.html">Map</a>
+      <a href="about.html" aria-current="page">About</a>
+      <button class="sound-btn" type="button" aria-pressed="false" aria-label="Toggle sound">
+        <img class="snd-on" src="../images/sound-on.webp" alt="" aria-hidden="true">
+        <img class="snd-off" src="../images/sound-off.webp" alt="" aria-hidden="true">
+      </button>
+    </nav>
+  </header>
+
+  <main class="about-page">
+    <!-- Hero -->
+    <section class="about-hero">
+      <h1 class="display">ABOUT</h1>
+      <div class="about-banner" role="img" aria-label="Green gradient artwork"></div>
+    </section>
+
+    <!-- Our story -->
+    <section class="split light">
+      <h2 class="title">Our story</h2>
+      <div class="split-text">
+        <p>The team of 4057 have always valued a more sustainable future where we are not trying to stop the progression of technology but rather ensure that we are taking care of the waste said progression is leaving behind.</p>
+        <p>In some corner or hidden draw in the house, we all have a secret stash of old wires, phones, and technology that can no longer be used, but we hold onto it because we have all been told certain parts cannot be recycled.</p>
+        <p>This lead us to explore how we could raise awareness into this issue in a manner than makes you want to keep scrolling, all the way through to the solutions that we found in local areas in NZ, starting with Tauranga!</p>
+      </div>
+    </section>
+
+    <!-- Mission -->
+    <section class="mission">
+      <div class="mission-text">
+        <h2 class="title">The mission</h2>
+        <p class="display-sm">Connecting users to local solutions</p>
+        <p>Our mission is to connect Gen Z kiwis living in Tauranga to local solutions while giving them an experience of what their home could one day become if we don’t do something about our e-waste habits now.</p>
+        <p>Currently, New Zealand is generating around 80,000+ tonnes of e-waste every year, and yet majority of us have nowhere to place it, leaving it in hidden draws and boxes around our homes.</p>
+        <p>Therefore, we aim to connect you to local solutions in Tauranga where you can take your e-waste and dispose of it properly.</p>
+      </div>
+      <!-- Optional image: add images/mission.jpg -->
+      <div class="mission-art" style="background-image:url('../images/mission.jpg')" aria-hidden="true"></div>
+    </section>
+
+    <!-- Values -->
+    <section class="values">
+      <h2 class="title">Values</h2>
+      <div class="values-grid">
+        <p class="values-intro">Our values summarise our positioning and essence behind the 4057 campaign</p>
+        <ol class="values-list">
+          <li><span class="num">01</span><span>Connection</span></li>
+          <li><span class="num">02</span><span>Community</span></li>
+          <li><span class="num">03</span><span>Sustainability</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact">
+      <div class="contact-info light">
+        <h2 class="title">Contact us</h2>
+        <p>If you have any questions or are wanting to get your recycling business involved, contact us or see our FAQ’s below for more information.</p>
+        <ul class="contact-lines">
+          <li>
+            <img src="../images/phone-icon.webp" alt="" aria-hidden="true">
+            <a href="tel:+642102779327">02102779327</a>
+          </li>
+          <li>
+            <img src="../images/mail-icon.webp" alt="" aria-hidden="true">
+            <a href="mailto:project4057@gmail.com">project4057@gmail.com</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Netlify Forms: submissions appear in your Netlify dashboard under Forms -->
+      <form class="contact-form" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="about.html?sent=1#contact">
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hidden-field"><label>Leave this empty <input name="bot-field"></label></p>
+        <div class="row">
+          <span class="label" id="name-label">Name</span>
+          <input name="first-name" placeholder="First" aria-labelledby="name-label" autocomplete="given-name" required>
+          <input name="last-name" placeholder="Last" aria-label="Last name" autocomplete="family-name">
+        </div>
+        <div class="row">
+          <label class="label" for="email">Email</label>
+          <input id="email" type="email" name="email" placeholder="name@gmail.com" autocomplete="email" required>
+        </div>
+        <label class="label" for="question">Question</label>
+        <textarea id="question" name="question" rows="7" placeholder="Write your question here" required></textarea>
+        <p class="form-thanks" hidden>Thanks, your question has been sent. We'll get back to you soon.</p>
+        <button class="btn" type="submit">Submit</button>
+      </form>
+    </section>
+
+    <!-- FAQs -->
+    <section class="faqs" id="faqs">
+      <h2 class="title">Top 5 FAQ’s</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Why does e-waste matter?</summary>
+          <p>E-waste is currently the largest growing threat to our environment, and due to the fact the materials used in creating technology cannot be broken down by the environment for a very long time if at all, they sit there and as that grows so does the threat to our environment.</p>
+        </details>
+        <details>
+          <summary>Will there be other versions of this around NZ?</summary>
+          <p>Yes! 4057 will be spreading around New Zealand, starting with Tauranga which is where the project originated from.</p>
+        </details>
+        <details>
+          <summary>Isn’t e-waste not able to be recycled?</summary>
+          <p>E-waste can not be recycled in the typical way, however, there are companies and businesses who will take e-waste and break it down or send it onto bigger companies overseas who do have the tools to contain it and deal with it properly.</p>
+        </details>
+        <details>
+          <summary>Where can I find my local solutions?</summary>
+          <p>Visit our <a href="map.html">map</a> found at the top of the screen on the menu and you will be able to see lit up dots on a map of Tauranga, click on them to see the business and general information about them.</p>
+        </details>
+        <details>
+          <summary>Can I get my business involved even if it’s small?</summary>
+          <p>We are always on the look out for new and upcoming businesses to include in our campaign, to get involved, email or <a href="#contact">contact us</a> as shown above.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-cols">
+      <div>
+        <h3>Pages</h3>
+        <a href="../index.html">home</a><a href="map.html">map</a><a href="about.html">about</a><a href="explore.html">explore</a>
+      </div>
+      <div>
+        <h3>Social</h3>
+        <!-- TODO: add your social links -->
+        <a href="#">instagram</a><a href="#">facebook</a><a href="#">linkedin</a><a href="#">youtube</a>
+      </div>
+      <div>
+        <h3>Mail</h3>
+        <a href="mailto:proj4057@gmail.com">proj4057@gmail.com</a>
+      </div>
+      <a class="footer-logo" href="../index.html" aria-label="4057 home"><img src="../images/logo-white.webp" alt="4057" width="800" height="266"></a>
+    </div>
+    <p class="copyright">© 2026</p>
+  </footer>
+
+  <audio id="ambient" src="../audio/4057-soundtrack.m4a" loop preload="none"></audio>
+  <script src="../js/script.js"></script>
+  <script>
+    // FAQ: only one answer open at a time
+    document.querySelectorAll(".faq-list details").forEach((d, _, all) => {
+      d.addEventListener("toggle", () => { if (d.open) all.forEach((o) => o !== d && (o.open = false)); });
+    });
+    // Show a thank-you message after Netlify redirects back here
+    if (new URLSearchParams(location.search).has("sent")) {
+      document.querySelector(".form-thanks").hidden = false;
+    }
+  </script>
+</body>
+</html>

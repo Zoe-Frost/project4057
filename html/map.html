@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4057 — Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../">
+  <header class="nav">
+    <a class="logo" href="../index.html" aria-label="4057 home"><img class="logo-light" src="../images/logo-white.webp" alt="4057" width="78" height="26"><img class="logo-dark" src="../images/logo-black.webp" alt="" width="78" height="26"></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="explore.html">Explore</a>
+      <a href="map.html" aria-current="page">Map</a>
+      <a href="about.html">About</a>
+      <button class="sound-btn" type="button" aria-pressed="false" aria-label="Toggle sound">
+        <img class="snd-on" src="../images/sound-on.webp" alt="" aria-hidden="true">
+        <img class="snd-off" src="../images/sound-off.webp" alt="" aria-hidden="true">
+      </button>
+    </nav>
+  </header>
+
+  <main class="map-page" id="map">
+    <div class="map-art">
+      <div class="map-frame">
+        <!-- The layer is the full map image, offset to match the Figma crop. Marker positions are % of the map image. -->
+        <div class="map-layer">
+          <img src="../images/map.webp" alt="Outline map of Tauranga and Mount Maunganui" width="2000" height="1622">
+          <button class="marker" style="left:34.1%; top:58.7%" data-biz="computer-recyclers" aria-label="Computer Recyclers"></button>
+          <button class="marker" style="left:24.9%; top:73.6%" data-biz="econox" aria-label="Econox"></button>
+        </div>
+      </div>
+    </div>
+
+    <section class="map-panel" id="panel" aria-live="polite">
+      <div class="intro-panel">
+        <h1 class="map-title">MAP</h1>
+        <p class="body">On our map you will find local solutions where you are able to recycle your e-waste safely. Click the green locators to visit their website and learn more</p>
+      </div>
+    </section>
+  </main>
+
+  <audio id="ambient" src="../audio/4057-soundtrack.m4a" loop preload="none"></audio>
+  <script src="../js/script.js"></script>
+  <script src="../js/map.js"></script>
+</body>
+</html>
