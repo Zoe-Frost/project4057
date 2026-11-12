@@ -9,7 +9,7 @@ const BUSINESSES = {
     address: "17B Amber Crescent, Judea, Tauranga 3110",
     hours: "Monday - Friday 9:00am - 5:00pm",
     overview: "Computer Recyclers is a locally owned business in Judea, Tauranga. For the past 24 years that they have been open, Computer Recyclers have worked closely with businesses and individuals in the community in order to help minimise the footprint e-waste is having on our environment and want the best outcomes for you and the environment.",
-    services: ["E-waste Drop Offs", "E-waste Pick Ups", "Data Destruction", "New and Used Laptop and PC's", "New and Used Laptop and PC Parts", "Laptop and PC Repairs", "Networking"],
+    services: ["E-waste Drop Offs", "E-waste Pick Ups", "Data Destruction", "Laptop and PC Repairs"],
     url: "", // TODO: paste their website address here
   },
   econox: {
@@ -39,14 +39,20 @@ const BUSINESSES = {
         <button class="biz-close" type="button" aria-label="Close">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg>
         </button>
-        <h2 class="title">${esc(b.name)}</h2>
-        <p class="biz-meta">Address: ${esc(b.address)}<br>Hours: ${esc(b.hours)}</p>
-        <h3>Overview</h3>
-        <p>${esc(b.overview)}</p>
-        <h3>Services</h3>
-        <div class="biz-services">
-          <ul>${b.services.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
-          <a class="btn" href="${esc(href)}" target="_blank" rel="noopener">Visit</a>
+        <div class="biz-block">
+          <h2 class="title">${esc(b.name)}</h2>
+          <p class="biz-meta">Address: ${esc(b.address)}<br>Hours: ${esc(b.hours)}</p>
+        </div>
+        <div class="biz-block">
+          <h3>Overview</h3>
+          <p>${esc(b.overview)}</p>
+        </div>
+        <div class="biz-block">
+          <h3>Services</h3>
+          <div class="biz-services">
+            <ul>${b.services.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
+            <a class="btn" href="${esc(href)}" target="_blank" rel="noopener">Visit</a>
+          </div>
         </div>
       </article>`;
     panel.hidden = false;

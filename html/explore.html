@@ -45,36 +45,32 @@
 
       <!-- Each block's data-scene must match an id in SCENES (js/explore.js) -->
       <div class="copy intro" data-scene="intro">
-        <span class="scroll-icon" aria-hidden="true"></span>
-        <div class="text">
-          <h1 class="title">Scroll to start</h1>
-          <p class="body">This is a scroll/drag-down experience that moves forwards when you scroll, to move back, simply do the opposite</p>
-        </div>
+        <h1 class="title">Scroll to start</h1>
       </div>
 
       <div class="copy right" data-scene="welcome">
         <h2 class="title">Welcome</h2>
-        <p class="body">We welcome you to 4057, it has been some time, but we remember you. Experience the future far beyond, or maybe it is sooner than you realise</p>
+        <p class="body">We welcome you to 4057, it has been some time, but we remember you. Experience the future far beyond, or maybe it is coming sooner than you realise</p>
       </div>
 
       <div class="copy left" data-scene="drawer">
         <h2 class="title">Open up</h2>
-        <p class="body">What people once thought was just a draw of trash, was much more than that, it was the very beginning, of the end</p>
+        <p class="body">What people once thought was just a drawer hidden away in a quiet corner of the house was much more than that, it was the very beginning, of the end</p>
       </div>
 
       <div class="copy right" data-scene="pie">
         <h2 class="title">Eat your fill</h2>
-        <p class="body">The toxic chemicals have infiltrated your dinner, are you excited, disgusted? well, we would not know, we cant eat after all</p>
+        <p class="body">The toxic chemicals have infiltrated your dinner, are you excited, disgusted? well, we would not know, we can not eat after all</p>
       </div>
 
       <div class="copy left" data-scene="boardwalk">
         <h2 class="title">Take a stroll</h2>
-        <p class="body">Fitness is important for the human body, the sun is out, try not to get burned. Current temperature: 45 degrees</p>
+        <p class="body">Fitness is important for the human body, watch your step, you may end up caught in it</p>
       </div>
 
       <div class="copy right" data-scene="pilotbay">
         <h2 class="title">Dive in</h2>
-        <p class="body">Currently, the amount of marine life found in the ocean is at 20% compared to what It used to be</p>
+        <p class="body">But watch out for the wires, you could end up with a shock to the system. Probability of live electricity is 30%, do you still want to spend your summer at the beach?</p>
       </div>
 
       <div class="copy left" data-scene="mauao">
@@ -84,7 +80,7 @@
 
       <div class="copy center end-copy" data-scene="end">
         <h2 class="title">Uncover the hidden in your home</h2>
-        <p class="body">Make the right changes before that drawer goes beyond your reach. Visit the map to see the local businesses addressing the issue.</p>
+        <p class="body">Make the right changes before that drawer goes beyond your reach. Visit the map to see the local businesses addressing and recycling e-waste</p>
         <a class="btn" href="map.html">Visit</a>
       </div>
 
@@ -96,8 +92,11 @@
   <script src="../js/script.js"></script>
   <script src="../js/explore.js"></script>
   <script>
-    // Hide the "rotate your device" message after 10 seconds
-    setTimeout(() => document.querySelector(".rotate-note").classList.add("is-dismissed"), 10000);
+    // After 10 seconds, fade out the "rotate your device" message and the "Scroll to start" prompt
+    setTimeout(() => {
+      document.querySelector(".rotate-note").classList.add("is-dismissed");
+      document.querySelector(".copy.intro").classList.add("is-timed-out");
+    }, 10000);
   </script>
 </body>
 </html>

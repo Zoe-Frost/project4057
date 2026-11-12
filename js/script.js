@@ -89,3 +89,12 @@
   menu.querySelector(".menu-close").addEventListener("click", close);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menu.classList.contains("is-open")) close(); });
 })();
+
+(() => {
+  // Darken the nav once the page has scrolled (not on Explore, which has its own shading)
+  const nav = document.querySelector(".nav");
+  if (!nav || document.getElementById("experience")) return;
+  const update = () => nav.classList.toggle("is-scrolled", window.scrollY > 8);
+  window.addEventListener("scroll", update, { passive: true });
+  update();
+})();

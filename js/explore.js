@@ -8,7 +8,7 @@
      length : how much scrolling the scene takes (in screen heights)
      still  : a single image (slow zoom) instead of frames
      seq    : an image sequence, e.g. frames/boardwalk/frame_0001.png
-     fogIn / fogOut : false = no fog at that edge (for continuous shots)
+     fogIn / fogOut : false = no fog at that edge (for continuous shots), "black" = fade through black
      hold   : where in the frames the camera slows for the text (0–1, default 0.42)
    ========================================================= */
 const SCENES = [
@@ -19,10 +19,10 @@ const SCENES = [
   // Room render: black 0–20, drawer 24–60, dive into the wires 60–84, pan to the table, pie at 112–120
   { id: "drawer",    length: 3.5, fogIn: false, fogOut: false, hold: 0.5,
     seq: { dir: "../frames/room/", prefix: "frame_", start: 0,  end: 80,  pad: 4, ext: "webp" } },
-  { id: "pie",       length: 2.5, fogIn: false, hold: 0.88,
+  { id: "pie",       length: 2.5, fogIn: false, fogOut: "black", hold: 0.88,
     seq: { dir: "../frames/room/", prefix: "frame_", start: 81, end: 120, pad: 4, ext: "webp" } },
   // Boardwalk flows straight into the final render (its frame 1 = boardwalk frame 120)
-  { id: "boardwalk", length: 3.5, fogOut: false,
+  { id: "boardwalk", length: 3.5, fogIn: "black", fogOut: false,
     seq: { dir: "../frames/boardwalk/", prefix: "frame_", start: 1, end: 120, pad: 4, ext: "webp" } },
   // Final render, 450 frames: e-waste fields (text ~frame 120), up Mauao (text ~frame 240),
   // over the top, dive into the ocean (~400) and rise to the final view of the Mount (450)
@@ -132,7 +132,6 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     return false;
   }
 
-  const phoneLandscape = window.matchMedia("(max-height: 500px) and (orientation: landscape)");
   let current = null;   // smoothed scroll position, in screen heights
   let lastT = 0;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -171,23 +170,31 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
       if (e.ok) { drawCover(e.img, 1 + 0.08 * t); drew = true; }
     } else if (scene.seq) {
       drew = drawBlended(scene.seq, scene.seq.start + holdEase(t, scene.hold) * (scene.seq.end - scene.seq.start));
-    } else if (scene.id === "intro" && phoneLandscape.matches && SCENES[1].seq) {
+    } else if (scene.id === "intro" && SCENES[1].seq) {
       preload(SCENES[1]);
-      drew = drawBlended(SCENES[1].seq, SCENES[1].seq.start);   // phones: show the first welcome frame behind "Scroll to start"
+      drew = drawBlended(SCENES[1].seq, SCENES[1].seq.start);   // show the first welcome frame behind "Scroll to start"
     } else if (scene.holdPrevious && SCENES[idx - 1] && SCENES[idx - 1].seq) {
       const prev = SCENES[idx - 1].seq;
       preload(SCENES[idx - 1]);
+      // End screen: the last frame, blurred and darkened behind the text
+      const k = ramp(t, 0, 0.3);
+      ctx.save();
+      ctx.filter = `blur(${Math.round(40 * k * (canvas.width / 1920))}px)`;
+      const pad = 1 + 0.08 * k;                    // scale up slightly so blurred edges stay filled
+      ctx.translate(canvas.width / 2, canvas.height / 2); ctx.scale(pad, pad); ctx.translate(-canvas.width / 2, -canvas.height / 2);
       drew = drawBlended(prev, prev.end);
-      ctx.fillStyle = `rgba(17,17,17,${(0.55 * ramp(t, 0, 0.35)).toFixed(3)})`;  // darken behind the end text
+      ctx.restore();
+      ctx.fillStyle = `rgba(17,22,17,${(0.45 * k).toFixed(3)})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
     if (!drew && (scene.seq || scene.still)) placeholder(scene.id);
 
     // fog between scenes
-    let f = 0;
-    if (idx > 0 && scene.fogIn !== false) f = Math.max(f, 1 - t / FOG_EDGE);
-    if (idx < SCENES.length - 1 && scene.fogOut !== false) f = Math.max(f, (t - (1 - FOG_EDGE)) / FOG_EDGE);
+    let f = 0, black = false;
+    if (idx > 0 && scene.fogIn !== false && t < FOG_EDGE) { f = 1 - t / FOG_EDGE; black = scene.fogIn === "black"; }
+    if (idx < SCENES.length - 1 && scene.fogOut !== false && t > 1 - FOG_EDGE) { f = (t - (1 - FOG_EDGE)) / FOG_EDGE; black = scene.fogOut === "black"; }
     fog.style.opacity = clamp(f).toFixed(3);
+    fog.classList.toggle("is-black", black);
 
     // text
     for (const [id, el] of Object.entries(copies)) {

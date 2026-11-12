@@ -27,69 +27,49 @@
   </header>
 
   <main class="about-page">
-    <!-- Hero -->
-    <section class="about-mhero only-mobile">
-      <h1 class="display-font">Behind the scenes</h1>
-      <p>Get to know the story behind 4057 and learn about where our mission started and where it’s going in the future</p>
-    </section>
-    <section class="about-hero only-desktop">
-      <h1 class="display">ABOUT</h1>
-      <div class="about-banner" role="img" aria-label="Green gradient artwork"></div>
-    </section>
-
-    <!-- Our story -->
-    <section class="split light">
-      <h2 class="title">Our story</h2>
-      <div class="split-text">
-        <p>My name is Zoe and I have always valued a more sustainable future where we are not trying to stop the progression of technology but rather ensure that we are taking care of the waste said progression is leaving behind.</p>
-        <p>In some corner or hidden drawer in the house, we all have a secret stash of old wires, phones, and technology that can no longer be used, but we hold onto it because we are unsure which parts can be recycled.</p>
-        <p>These thoughts lead the exploration into how we could raise awareness around e-waste in a way that makes you want to keep scrolling, all the way through to the solutions in NZ local areas, starting with Tauranga!</p>
-        <!-- Add your photo as images/zoe.jpg -->
-        <img class="story-photo only-mobile" src="../images/zoe.jpg" alt="Zoe, creator of 4057" onerror="this.remove()">
+    <section class="about-hero">
+      <div>
+        <h1 class="display-font">Behind the scenes</h1>
+        <p>Get to know the story behind 4057 and learn about where our mission started and where it’s going in the future</p>
       </div>
     </section>
 
-    <!-- Mission -->
-    <section class="mission">
-      <div class="mission-text">
-        <h2 class="title">The mission</h2>
-        <p class="display-sm only-desktop">Connecting users to local solutions</p>
+    <section class="about-row story">
+      <h2 class="title">Our story</h2>
+      <!-- Your photo: images/zoe.jpg -->
+      <img class="about-img story-photo" src="../images/zoe.jpg" alt="Zoe, creator of 4057" onerror="this.remove()">
+      <div class="about-text">
+        <p>My name is Zoe and I have always valued a more sustainable future where we are not trying to stop the progression of technology but rather ensure that we are taking care of the waste said progression is leaving behind.</p>
+        <p>In some corner or hidden drawer in the house, we all have a secret stash of old wires, phones, and technology that can no longer be used, but we hold onto it because we are unsure which parts can and cannot be recycled.</p>
+        <p>These thoughts lead the exploration into how we could raise awareness around e-waste in a way that makes you want to keep scrolling, all the way through to the solutions in NZ local areas, starting with Tauranga!</p>
+      </div>
+    </section>
+
+    <section class="about-row mission">
+      <h2 class="title">The mission</h2>
+      <!-- Your pie render (last frame of the room scene) -->
+      <div class="about-img mission-art" style="background-image:url('../frames/room/frame_0120.webp')" role="img" aria-label="The toxic mince pie render"></div>
+      <div class="about-text">
         <p>Our mission is to connect kiwis living in Tauranga to local solutions while giving them an experience of what their home could one day become if we don’t do something about our e-waste habits now.</p>
-        <p>Currently, New Zealand is generating around 80,000+ tonnes of e-waste every year, and yet majority of us have nowhere to place it, leaving it in hidden draws and boxes around our homes.</p>
+        <p>Currently, New Zealand is generating around 80,000+ tonnes of e-waste every year, and yet majority of us have nowhere to place it, leaving it in hidden drawers and boxes around our homes.</p>
         <p>Therefore, we aim to connect you to local solutions in Tauranga where you can take your e-waste and dispose of it properly.</p>
       </div>
-      <!-- Your pie render (last frame of the room scene) -->
-      <div class="mission-art" style="background-image:url('../frames/room/frame_0120.webp')" role="img" aria-label="The toxic mince pie render"></div>
     </section>
 
-    <!-- Values -->
     <section class="values">
       <h2 class="title">Values</h2>
-      <div class="values-grid">
-        <p class="values-intro">These values summaries the essence of project 4057 and what we hope to achieve in our local communities through this campaign.</p>
-        <ol class="values-list">
-          <li><span class="num">Ø1</span><span>Connection</span></li>
-          <li><span class="num">Ø2</span><span>Community</span></li>
-          <li><span class="num">Ø3</span><span>Sustainability</span></li>
-        </ol>
-      </div>
+      <p class="values-intro">These values summarise the essence of project 4057 and what we hope to achieve in our local communities through this campaign.</p>
+      <ol class="values-list">
+        <li><span class="num">Ø1</span><span>Connection</span></li>
+        <li><span class="num">Ø2</span><span>Community</span></li>
+        <li><span class="num">Ø3</span><span>Sustainability</span></li>
+      </ol>
     </section>
 
-    <!-- Contact -->
     <section class="contact" id="contact">
-      <div class="contact-info light">
+      <div class="contact-info">
         <h2 class="title">Get in touch</h2>
         <p>If you have any questions or are wanting to get your recycling business involved, contact us or see our FAQ’s below for more information.</p>
-        <ul class="contact-lines">
-          <li>
-            <img src="../images/phone-icon.webp" alt="" aria-hidden="true">
-            <a href="tel:+642102779327">02102779327</a>
-          </li>
-          <li>
-            <img src="../images/mail-icon.webp" alt="" aria-hidden="true">
-            <a href="mailto:contact@proj4057.com">Contact@proj4057.com</a>
-          </li>
-        </ul>
       </div>
 
       <!-- Netlify Forms: submissions appear in your Netlify dashboard under Forms -->
@@ -97,32 +77,28 @@
         <input type="hidden" name="form-name" value="contact">
         <p class="hidden-field"><label>Leave this empty <input name="bot-field"></label></p>
         <div class="row">
-          <span class="label only-desktop" aria-hidden="true">Name</span>
-          <label class="field"><span class="m-label only-mobile">First name</span><input name="first-name" placeholder="First name" autocomplete="given-name" required></label>
-          <label class="field"><span class="m-label only-mobile">Last name</span><input name="last-name" placeholder="Last name" autocomplete="family-name"></label>
+          <label class="field"><span class="label">First name</span><input name="first-name" placeholder="First name" autocomplete="given-name" required></label>
+          <label class="field"><span class="label">Last name</span><input name="last-name" placeholder="Last name" autocomplete="family-name"></label>
         </div>
-        <div class="row">
+        <div class="field">
           <label class="label" for="email">Email</label>
           <input id="email" type="email" name="email" placeholder="Email" autocomplete="email" required>
         </div>
-        <label class="label" for="question">Message</label>
-        <textarea id="question" name="question" rows="7" placeholder="Send us your message" required></textarea>
+        <div class="field">
+          <label class="label" for="question">Message</label>
+          <textarea id="question" name="question" rows="7" placeholder="Send us your message" required></textarea>
+        </div>
         <p class="form-thanks" hidden>Thanks, your question has been sent. We'll get back to you soon.</p>
         <button class="btn" type="submit">Submit</button>
       </form>
     </section>
 
-    <!-- FAQs -->
     <section class="faqs" id="faqs">
       <h2 class="title">FAQ’s</h2>
       <div class="faq-list">
         <details>
           <summary>Why does e-waste matter?</summary>
           <p>E-waste is currently the largest growing threat to our environment, and due to the fact the materials used in creating technology cannot be broken down by the environment for a very long time if at all, they sit there and as that grows so does the threat to our environment.</p>
-        </details>
-        <details class="only-desktop">
-          <summary>Will there be other versions of this around NZ?</summary>
-          <p>Yes! 4057 will be spreading around New Zealand, starting with Tauranga which is where the project originated from.</p>
         </details>
         <details>
           <summary>Isn’t e-waste not able to be recycled?</summary>
@@ -133,7 +109,7 @@
           <p>Visit our <a href="map.html">map</a> found at the top of the screen on the menu and you will be able to see lit up dots on a map of Tauranga, click on them to see the business and general information about them.</p>
         </details>
         <details class="faq-small">
-          <summary>Can I get my business involved even if it’s small?</summary>
+          <summary>Can I get my business involved if it’s small?</summary>
           <p>We are always on the look out for new and upcoming businesses to include in our campaign, to get involved, email or <a href="#contact">contact us</a> as shown above.</p>
         </details>
       </div>
@@ -142,16 +118,11 @@
 
   <footer class="footer">
     <div class="footer-cols">
-      <div>
+      <div class="foot-pages">
         <h3>Pages</h3>
-        <a href="../index.html">home</a><a href="map.html">map</a><a href="about.html">about</a><a href="explore.html">explore</a>
+        <a href="../index.html">Home</a><a href="map.html">Map</a><a href="about.html">About</a><a href="explore.html">Explore</a>
       </div>
-      <div class="only-desktop">
-        <h3>Social</h3>
-        <!-- TODO: add your social links -->
-        <a href="#">instagram</a><a href="#">facebook</a><a href="#">linkedin</a><a href="#">youtube</a>
-      </div>
-      <div>
+      <div class="foot-mail">
         <h3>Mail</h3>
         <a href="mailto:contact@proj4057.com">Contact@proj4057.com</a>
       </div>
