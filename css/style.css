@@ -9,7 +9,7 @@
   --muted: #c9c9c9;
   --green: #44D62C;        /* brand green (swap for exact hex) */
   --green-soft: #44D62C;
-  --nav-h: 88px;
+  --nav-h: clamp(64px, calc(64px + 24 * (100vw - 360px) / 1080), 88px);   /* nav bar height grows with the screen */
   --gutter: clamp(20px, 5vw, 64px);
   --font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
   --display: "403SuperVega-Regular", "Roboto", sans-serif;   /* header font: fonts/403-super-vega-regular.css */
@@ -49,7 +49,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   padding: 0 var(--gutter);
   background: linear-gradient(to bottom, rgba(17,17,17,.55), rgba(17,17,17,0));
 }
-.logo { display: flex; align-items: center; height: 26px; }
+.logo { display: flex; align-items: center; height: clamp(20px, calc(20px + 8 * (100vw - 360px) / 1080), 28px); }
 .logo img { height: 100%; width: auto; }
 /* Over white sections the nav switches to the black logo / dark text (set by js/script.js) */
 .logo .logo-dark { display: none; }
@@ -58,11 +58,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav.logo-on-light .logo .logo-dark { display: block; }
 .nav.links-on-light .nav-links a:not([aria-current]) { color: #111; }
 .logo-text { font-size: 24px; font-weight: 300; letter-spacing: .06em; }
-.nav-links { display: flex; align-items: center; gap: clamp(24px, 6vw, 90px); }
+.nav-links { display: flex; align-items: center; gap: clamp(18px, calc(18px + 72 * (100vw - 360px) / 1080), 90px); }
 .nav-links a { font-size: var(--fs-nav); font-weight: 400; opacity: .9; transition: color .2s, opacity .2s; }
 .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--green); opacity: 1; }
-.sound-btn { width: 34px; height: 34px; display: grid; place-items: center; color: var(--green); }
-.sound-btn img { width: 30px; height: auto; }
+.sound-btn { width: clamp(26px, calc(26px + 8 * (100vw - 360px) / 1080), 34px); height: clamp(26px, calc(26px + 8 * (100vw - 360px) / 1080), 34px); display: grid; place-items: center; color: var(--green); }
+.sound-btn img { width: 88%; height: auto; }
 .sound-btn .snd-on, .sound-btn[aria-pressed="false"] .snd-off { display: block; }
 .sound-btn .snd-off, .sound-btn[aria-pressed="false"] .snd-on { display: none; }
 
@@ -181,7 +181,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .map-page.has-selection .map-art { visibility: hidden; }   /* only one box shows at a time */
 .biz { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: clamp(18px, 2.4vh, 30px); }
 /* The card is at least as tall as the map box and grows to fit, so it never scrolls; extra room is shared between its three parts */
-.biz-close { position: absolute; top: 0; right: 0; width: 34px; height: 34px; }
+.biz-close { position: absolute; top: 0; right: 0; width: clamp(26px, calc(26px + 10 * (100vw - 360px) / 1080), 36px); height: clamp(26px, calc(26px + 10 * (100vw - 360px) / 1080), 36px); }
 .biz-close svg { width: 100%; height: 100%; fill: none; stroke: var(--green); stroke-width: 1.6; }
 .biz .title { font-size: var(--fs-h2); font-weight: 400; padding: 30px 50px 0 0; }
 .biz-meta { margin-top: 8px; font-size: var(--fs-sm); line-height: 1.3; }
@@ -194,15 +194,22 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .about-page { background: var(--bg); }
 .about-hero {
   position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center;
-  min-height: 100vh; min-height: 100svh; padding: var(--nav-h) var(--gutter) 10vh;
+  min-height: 100vh; min-height: 100svh; padding: calc(var(--nav-h) + 30px) var(--gutter) 60px;   /* same as the map page, so both titles sit at the same height */
 }
-.about-hero::before { /* blurred render behind the title */
-  content: ""; position: absolute; inset: -40px; z-index: -1;
-  background: linear-gradient(rgba(12,18,13,.55), rgba(12,18,13,.6) 60%, var(--bg)), url("../frames/mtpilot/frame_0381.webp") center / cover;
-  filter: blur(14px) saturate(.9);
+.about-hero { /* same green glow as the map page */
+  background: radial-gradient(ellipse 75% 40% at 40% 50%, #34503a 0%, #1b2a1f 50%, #0f140f 100%);
 }
-.about-hero h1 { font-size: var(--fs-display); }
-.about-hero p { margin-top: 10px; max-width: 480px; font-size: var(--fs-body); font-weight: 300; line-height: 1.25; }
+.about-hero::before { /* the wires render layered on top, faded right down */
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: url("../frames/mtpilot/frame_0120.webp") center / cover;
+  opacity: .14; filter: grayscale(.3);
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+}
+.about-hero h1 { font-size: var(--fs-display); line-height: 1; }
+.about-hero p { margin-top: 10px; max-width: 470px; font-size: var(--fs-body); font-weight: 300; line-height: 1.3; }
+/* Both intro paragraphs reserve 4 lines, so MAP and BEHIND THE SCENES land at exactly the same height */
+.about-hero p, .map-intro .body { min-height: 5.2em; }
 
 .about-row {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "title ." "img text";
@@ -213,7 +220,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .about-row .about-text { grid-area: text; }
 .about-text p { font-size: var(--fs-body); font-weight: 300; line-height: 1.25; }
 .about-text p + p { margin-top: 22px; }
-.story-photo { width: min(100%, 320px); border-radius: 14px; filter: grayscale(1); }
+.story-photo { width: min(100%, 340px); aspect-ratio: 6 / 5; object-fit: cover; object-position: 50% 30%; border-radius: 14px; filter: grayscale(1); }
 .mission-art { aspect-ratio: 43 / 21; border-radius: 14px; background: center / cover no-repeat; background-position: 55% 60%; }
 
 .values {
@@ -283,7 +290,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s;
 }
 .menu-overlay.is-open { opacity: 1; visibility: visible; }
-.menu-close { display: block; margin-left: auto; width: 46px; height: 46px; }
+.menu-close { display: block; margin-left: auto; width: clamp(30px, calc(30px + 14 * (100vw - 360px) / 1080), 44px); height: clamp(30px, calc(30px + 14 * (100vw - 360px) / 1080), 44px); }
 .menu-close svg { width: 100%; height: 100%; fill: none; stroke: var(--green); stroke-width: 1.6; }
 .menu-title { font-size: var(--fs-display); margin: 18px 0 24px; }
 .menu-list a, .menu-list summary {
@@ -298,14 +305,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-setting .state { color: var(--green); }
 
 @media (max-width: 760px), (max-height: 500px) and (orientation: landscape) {
-  :root { --nav-h: 76px; --gutter: 22px; }
+  :root { --gutter: 22px; }
   .only-mobile { display: revert; }
   .only-desktop { display: none !important; }
   .nav { background: linear-gradient(to bottom, rgba(10, 14, 10, .7), rgba(10, 14, 10, 0)); }
   .nav-links a, .nav-links .sound-btn { display: none; }
-  .menu-btn { display: block; width: 44px; }
+  .menu-btn { display: block; width: clamp(30px, calc(30px + 14 * (100vw - 360px) / 1080), 44px); }
   .menu-btn img { width: 100%; height: auto; }
-  .logo { height: 34px; }
 }
 
 @media (max-width: 760px) {
@@ -349,7 +355,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   /* About: everything in one column */
   .about-row { grid-template-columns: 1fr; grid-template-areas: "title" "text" "img"; padding: 70px var(--gutter) 50px; row-gap: 16px; }
   .about-row .about-img { margin-top: 30px; }
-  .story-photo { width: 100%; }
+  .story-photo { width: 100%; aspect-ratio: 16 / 11; }
   .mission-art { aspect-ratio: 16 / 8; }
   .values { grid-template-columns: 1fr; grid-template-areas: "title" "intro" "list"; row-gap: 14px; padding: 70px var(--gutter) 90px; }
   .values-intro { max-width: none; }

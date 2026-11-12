@@ -12,9 +12,9 @@
      hold   : where in the frames the camera slows for the text (0–1, default 0.42)
    ========================================================= */
 const SCENES = [
-  { id: "intro",     length: 1.2 },
+  { id: "intro",     length: 1.2, fogOut: false },
   // Camera tilts down from Mauao into the dark water (1–95), then black (95–110)
-  { id: "welcome",   length: 3,   fogOut: false, hold: 0.18,
+  { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18,
     seq: { dir: "../frames/welcome/", prefix: "frame_", start: 1, end: 110, pad: 4, ext: "webp" } },
   // Room render: black 0–20, drawer 24–60, dive into the wires 60–84, pan to the table, pie at 112–120
   { id: "drawer",    length: 3.5, fogIn: false, fogOut: false, hold: 0.5,

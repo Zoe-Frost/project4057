@@ -10,7 +10,7 @@ const BUSINESSES = {
     hours: "Monday - Friday 9:00am - 5:00pm",
     overview: "Computer Recyclers is a locally owned business in Judea, Tauranga. For the past 24 years that they have been open, Computer Recyclers have worked closely with businesses and individuals in the community in order to help minimise the footprint e-waste is having on our environment and want the best outcomes for you and the environment.",
     services: ["E-waste Drop Offs", "E-waste Pick Ups", "Data Destruction", "Laptop and PC Repairs"],
-    url: "", // TODO: paste their website address here
+    url: "https://computerrecyclers.co.nz/",
   },
   econox: {
     name: "Econox",
@@ -18,7 +18,7 @@ const BUSINESSES = {
     hours: "Mon, Wed, Fri 9:00am - 4:00pm Sat 9:00am - 1:00pm",
     overview: "Econox is a locally owned and operated company in Omanawa, Tauranga. They are the leading polystyrene recyclers in Tauranga and the Western Bay of Plenty but are also involved in recycling e-waste. At Econox, they are passionate about building a sustainable future for New Zealand and strive to champion circular recycling and divert valuable resources from ending up in landfills.",
     services: ["E-waste Management", "Data Deconstruction", "Polystyrene Recycling"],
-    url: "", // TODO: paste their website address here
+    url: "https://econox.co.nz/",
   },
 };
 
@@ -32,7 +32,6 @@ const BUSINESSES = {
   function show(id) {
     const b = BUSINESSES[id];
     if (!b) return;
-    // Until a website is added, Visit searches for the business instead.
     const href = b.url || `https://www.google.com/search?q=${encodeURIComponent(b.name + " Tauranga")}`;
     panel.innerHTML = `
       <article class="biz panel-fade">
