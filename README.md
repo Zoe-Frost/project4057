@@ -1,0 +1,1 @@
+4057 takes users through a dystopian journey of Tauranga in the year 4057, where everything has been covered in e-waste and directs them towards local solutions. <img width="468" height="40" alt="image" src="https://github.com/user-attachments/assets/d015d883-f250-4bf8-b4ac-32fc67805523" />
