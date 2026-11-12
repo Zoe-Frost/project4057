@@ -6,7 +6,8 @@
   <title>4057 — Map</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../fonts/403-super-vega-regular.css">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body data-root="../">
@@ -20,10 +21,15 @@
         <img class="snd-on" src="../images/sound-on.webp" alt="" aria-hidden="true">
         <img class="snd-off" src="../images/sound-off.webp" alt="" aria-hidden="true">
       </button>
+      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><img src="../images/menu-icon.webp" alt=""></button>
     </nav>
   </header>
 
   <main class="map-page" id="map">
+    <div class="map-intro">
+      <h1 class="map-title">MAP</h1>
+      <p class="body">On our map you will find local solutions where you are able to recycle your e-waste safely. Click the green locators to visit their website and learn more about what they do</p>
+    </div>
     <div class="map-art">
       <div class="map-frame">
         <!-- The layer is the full map image, offset to match the Figma crop. Marker positions are % of the map image. -->
@@ -35,12 +41,7 @@
       </div>
     </div>
 
-    <section class="map-panel" id="panel" aria-live="polite">
-      <div class="intro-panel">
-        <h1 class="map-title">MAP</h1>
-        <p class="body">On our map you will find local solutions where you are able to recycle your e-waste safely. Click the green locators to visit their website and learn more</p>
-      </div>
-    </section>
+    <section class="map-panel" id="panel" aria-live="polite" hidden></section>
   </main>
 
   <audio id="ambient" src="../audio/4057-soundtrack.m4a" loop preload="none"></audio>

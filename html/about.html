@@ -7,7 +7,8 @@
   <meta name="description" content="Our story, mission and values, plus how to contact the 4057 team about e-waste in Tauranga.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../fonts/403-super-vega-regular.css">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body data-root="../">
@@ -21,12 +22,17 @@
         <img class="snd-on" src="../images/sound-on.webp" alt="" aria-hidden="true">
         <img class="snd-off" src="../images/sound-off.webp" alt="" aria-hidden="true">
       </button>
+      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><img src="../images/menu-icon.webp" alt=""></button>
     </nav>
   </header>
 
   <main class="about-page">
     <!-- Hero -->
-    <section class="about-hero">
+    <section class="about-mhero only-mobile">
+      <h1 class="display-font">Behind the scenes</h1>
+      <p>Get to know the story behind 4057 and learn about where our mission started and where it’s going in the future</p>
+    </section>
+    <section class="about-hero only-desktop">
       <h1 class="display">ABOUT</h1>
       <div class="about-banner" role="img" aria-label="Green gradient artwork"></div>
     </section>
@@ -35,9 +41,11 @@
     <section class="split light">
       <h2 class="title">Our story</h2>
       <div class="split-text">
-        <p>The team of 4057 have always valued a more sustainable future where we are not trying to stop the progression of technology but rather ensure that we are taking care of the waste said progression is leaving behind.</p>
-        <p>In some corner or hidden draw in the house, we all have a secret stash of old wires, phones, and technology that can no longer be used, but we hold onto it because we have all been told certain parts cannot be recycled.</p>
-        <p>This lead us to explore how we could raise awareness into this issue in a manner than makes you want to keep scrolling, all the way through to the solutions that we found in local areas in NZ, starting with Tauranga!</p>
+        <p>My name is Zoe and I have always valued a more sustainable future where we are not trying to stop the progression of technology but rather ensure that we are taking care of the waste said progression is leaving behind.</p>
+        <p>In some corner or hidden drawer in the house, we all have a secret stash of old wires, phones, and technology that can no longer be used, but we hold onto it because we are unsure which parts can be recycled.</p>
+        <p>These thoughts lead the exploration into how we could raise awareness around e-waste in a way that makes you want to keep scrolling, all the way through to the solutions in NZ local areas, starting with Tauranga!</p>
+        <!-- Add your photo as images/zoe.jpg -->
+        <img class="story-photo only-mobile" src="../images/zoe.jpg" alt="Zoe, creator of 4057" onerror="this.remove()">
       </div>
     </section>
 
@@ -45,24 +53,24 @@
     <section class="mission">
       <div class="mission-text">
         <h2 class="title">The mission</h2>
-        <p class="display-sm">Connecting users to local solutions</p>
-        <p>Our mission is to connect Gen Z kiwis living in Tauranga to local solutions while giving them an experience of what their home could one day become if we don’t do something about our e-waste habits now.</p>
+        <p class="display-sm only-desktop">Connecting users to local solutions</p>
+        <p>Our mission is to connect kiwis living in Tauranga to local solutions while giving them an experience of what their home could one day become if we don’t do something about our e-waste habits now.</p>
         <p>Currently, New Zealand is generating around 80,000+ tonnes of e-waste every year, and yet majority of us have nowhere to place it, leaving it in hidden draws and boxes around our homes.</p>
         <p>Therefore, we aim to connect you to local solutions in Tauranga where you can take your e-waste and dispose of it properly.</p>
       </div>
-      <!-- Optional image: add images/mission.jpg -->
-      <div class="mission-art" style="background-image:url('../images/mission.jpg')" aria-hidden="true"></div>
+      <!-- Your pie render (last frame of the room scene) -->
+      <div class="mission-art" style="background-image:url('../frames/room/frame_0120.webp')" role="img" aria-label="The toxic mince pie render"></div>
     </section>
 
     <!-- Values -->
     <section class="values">
       <h2 class="title">Values</h2>
       <div class="values-grid">
-        <p class="values-intro">Our values summarise our positioning and essence behind the 4057 campaign</p>
+        <p class="values-intro">These values summaries the essence of project 4057 and what we hope to achieve in our local communities through this campaign.</p>
         <ol class="values-list">
-          <li><span class="num">01</span><span>Connection</span></li>
-          <li><span class="num">02</span><span>Community</span></li>
-          <li><span class="num">03</span><span>Sustainability</span></li>
+          <li><span class="num">Ø1</span><span>Connection</span></li>
+          <li><span class="num">Ø2</span><span>Community</span></li>
+          <li><span class="num">Ø3</span><span>Sustainability</span></li>
         </ol>
       </div>
     </section>
@@ -70,7 +78,7 @@
     <!-- Contact -->
     <section class="contact" id="contact">
       <div class="contact-info light">
-        <h2 class="title">Contact us</h2>
+        <h2 class="title">Get in touch</h2>
         <p>If you have any questions or are wanting to get your recycling business involved, contact us or see our FAQ’s below for more information.</p>
         <ul class="contact-lines">
           <li>
@@ -79,7 +87,7 @@
           </li>
           <li>
             <img src="../images/mail-icon.webp" alt="" aria-hidden="true">
-            <a href="mailto:project4057@gmail.com">project4057@gmail.com</a>
+            <a href="mailto:contact@proj4057.com">Contact@proj4057.com</a>
           </li>
         </ul>
       </div>
@@ -89,16 +97,16 @@
         <input type="hidden" name="form-name" value="contact">
         <p class="hidden-field"><label>Leave this empty <input name="bot-field"></label></p>
         <div class="row">
-          <span class="label" id="name-label">Name</span>
-          <input name="first-name" placeholder="First" aria-labelledby="name-label" autocomplete="given-name" required>
-          <input name="last-name" placeholder="Last" aria-label="Last name" autocomplete="family-name">
+          <span class="label only-desktop" aria-hidden="true">Name</span>
+          <label class="field"><span class="m-label only-mobile">First name</span><input name="first-name" placeholder="First name" autocomplete="given-name" required></label>
+          <label class="field"><span class="m-label only-mobile">Last name</span><input name="last-name" placeholder="Last name" autocomplete="family-name"></label>
         </div>
         <div class="row">
           <label class="label" for="email">Email</label>
-          <input id="email" type="email" name="email" placeholder="name@gmail.com" autocomplete="email" required>
+          <input id="email" type="email" name="email" placeholder="Email" autocomplete="email" required>
         </div>
-        <label class="label" for="question">Question</label>
-        <textarea id="question" name="question" rows="7" placeholder="Write your question here" required></textarea>
+        <label class="label" for="question">Message</label>
+        <textarea id="question" name="question" rows="7" placeholder="Send us your message" required></textarea>
         <p class="form-thanks" hidden>Thanks, your question has been sent. We'll get back to you soon.</p>
         <button class="btn" type="submit">Submit</button>
       </form>
@@ -106,13 +114,13 @@
 
     <!-- FAQs -->
     <section class="faqs" id="faqs">
-      <h2 class="title">Top 5 FAQ’s</h2>
+      <h2 class="title">FAQ’s</h2>
       <div class="faq-list">
         <details>
           <summary>Why does e-waste matter?</summary>
           <p>E-waste is currently the largest growing threat to our environment, and due to the fact the materials used in creating technology cannot be broken down by the environment for a very long time if at all, they sit there and as that grows so does the threat to our environment.</p>
         </details>
-        <details>
+        <details class="only-desktop">
           <summary>Will there be other versions of this around NZ?</summary>
           <p>Yes! 4057 will be spreading around New Zealand, starting with Tauranga which is where the project originated from.</p>
         </details>
@@ -124,7 +132,7 @@
           <summary>Where can I find my local solutions?</summary>
           <p>Visit our <a href="map.html">map</a> found at the top of the screen on the menu and you will be able to see lit up dots on a map of Tauranga, click on them to see the business and general information about them.</p>
         </details>
-        <details>
+        <details class="faq-small">
           <summary>Can I get my business involved even if it’s small?</summary>
           <p>We are always on the look out for new and upcoming businesses to include in our campaign, to get involved, email or <a href="#contact">contact us</a> as shown above.</p>
         </details>
@@ -138,14 +146,14 @@
         <h3>Pages</h3>
         <a href="../index.html">home</a><a href="map.html">map</a><a href="about.html">about</a><a href="explore.html">explore</a>
       </div>
-      <div>
+      <div class="only-desktop">
         <h3>Social</h3>
         <!-- TODO: add your social links -->
         <a href="#">instagram</a><a href="#">facebook</a><a href="#">linkedin</a><a href="#">youtube</a>
       </div>
       <div>
         <h3>Mail</h3>
-        <a href="mailto:proj4057@gmail.com">proj4057@gmail.com</a>
+        <a href="mailto:contact@proj4057.com">Contact@proj4057.com</a>
       </div>
       <a class="footer-logo" href="../index.html" aria-label="4057 home"><img src="../images/logo-white.webp" alt="4057" width="800" height="266"></a>
     </div>

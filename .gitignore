@@ -1,6 +1,8 @@
 # Original renders and full-size design exports (web versions live in frames/ and images/)
 4057_blender_environment/
 assets/
+# Original font download (web copies live in fonts/)
+Typography/
 
 # Mac junk
 .DS_Store

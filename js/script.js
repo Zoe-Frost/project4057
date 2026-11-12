@@ -50,17 +50,42 @@
 })();
 
 (() => {
-  // Soft green glow that follows the mouse (desktop only)
-  if (!window.matchMedia("(hover: hover)").matches) return;
-  const glow = document.createElement("div");
-  glow.className = "cursor-glow";
-  document.body.appendChild(glow);
-  let x = 0, y = 0, queued = false;
-  window.addEventListener("pointermove", (e) => {
-    x = e.clientX; y = e.clientY;
-    glow.classList.add("is-on");
-    glow.classList.toggle("is-hover", !!e.target.closest("a, button, summary, .marker"));
-    if (!queued) { queued = true; requestAnimationFrame(() => { glow.style.transform = `translate(${x}px, ${y}px)`; queued = false; }); }
-  }, { passive: true });
-  document.addEventListener("pointerleave", () => glow.classList.remove("is-on"));
+  // Phone menu: full-screen overlay opened by the menu icon
+  const btn = document.querySelector(".menu-btn");
+  if (!btn) return;
+  const root = document.body.dataset.root || "";
+  const here = location.pathname.split("/").pop() || "index.html";
+  const pages = [["Home", "index.html"], ["Explore", "html/explore.html"], ["Map", "html/map.html"], ["About", "html/about.html"]];
+  const menu = document.createElement("div");
+  menu.className = "menu-overlay";
+  menu.id = "menu";
+  menu.setAttribute("role", "dialog");
+  menu.setAttribute("aria-modal", "true");
+  menu.setAttribute("aria-label", "Menu");
+  menu.innerHTML = `
+    <button class="menu-close" type="button" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg>
+    </button>
+    <h2 class="menu-title display-font">Menu</h2>
+    <nav class="menu-list" aria-label="Main">
+      ${pages.map(([label, href]) => `<a href="${root}${href}"${href.endsWith(here) ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
+      <details>
+        <summary>Settings</summary>
+        <button class="menu-setting" type="button" data-setting="sound">Sound <span class="state"></span></button>
+      </details>
+    </nav>`;
+  document.body.appendChild(menu);
+
+  const soundBtn = document.querySelector(".sound-btn");
+  const soundSetting = menu.querySelector('[data-setting="sound"]');
+  const showSound = () => {
+    soundSetting.querySelector(".state").textContent = soundBtn && soundBtn.getAttribute("aria-pressed") === "true" ? "On" : "Off";
+  };
+  soundSetting.addEventListener("click", () => { if (soundBtn) soundBtn.click(); showSound(); });
+
+  const open = () => { showSound(); menu.classList.add("is-open"); btn.setAttribute("aria-expanded", "true"); document.body.style.overflow = "hidden"; menu.querySelector(".menu-close").focus(); };
+  const close = () => { menu.classList.remove("is-open"); btn.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; btn.focus(); };
+  btn.addEventListener("click", open);
+  menu.querySelector(".menu-close").addEventListener("click", close);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menu.classList.contains("is-open")) close(); });
 })();

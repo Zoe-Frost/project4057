@@ -25,7 +25,6 @@ const BUSINESSES = {
 (() => {
   const page = document.getElementById("map");
   const panel = document.getElementById("panel");
-  const introHTML = panel.innerHTML;
   const markers = page.querySelectorAll(".marker");
 
   const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -37,7 +36,10 @@ const BUSINESSES = {
     const href = b.url || `https://www.google.com/search?q=${encodeURIComponent(b.name + " Tauranga")}`;
     panel.innerHTML = `
       <article class="biz panel-fade">
-        <h1 class="title">${esc(b.name)}</h1>
+        <button class="biz-close" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg>
+        </button>
+        <h2 class="title">${esc(b.name)}</h2>
         <p class="biz-meta">Address: ${esc(b.address)}<br>Hours: ${esc(b.hours)}</p>
         <h3>Overview</h3>
         <p>${esc(b.overview)}</p>
@@ -47,12 +49,15 @@ const BUSINESSES = {
           <a class="btn" href="${esc(href)}" target="_blank" rel="noopener">Visit</a>
         </div>
       </article>`;
+    panel.hidden = false;
+    panel.querySelector(".biz-close").addEventListener("click", reset);
     page.classList.add("has-selection");
     markers.forEach((m) => m.classList.toggle("is-active", m.dataset.biz === id));
   }
 
   function reset() {
-    panel.innerHTML = introHTML;
+    panel.hidden = true;
+    panel.innerHTML = "";
     page.classList.remove("has-selection");
     markers.forEach((m) => m.classList.remove("is-active"));
   }

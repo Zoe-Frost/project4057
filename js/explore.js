@@ -132,6 +132,7 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     return false;
   }
 
+  const phoneLandscape = window.matchMedia("(max-height: 500px) and (orientation: landscape)");
   let current = null;   // smoothed scroll position, in screen heights
   let lastT = 0;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -170,6 +171,9 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
       if (e.ok) { drawCover(e.img, 1 + 0.08 * t); drew = true; }
     } else if (scene.seq) {
       drew = drawBlended(scene.seq, scene.seq.start + holdEase(t, scene.hold) * (scene.seq.end - scene.seq.start));
+    } else if (scene.id === "intro" && phoneLandscape.matches && SCENES[1].seq) {
+      preload(SCENES[1]);
+      drew = drawBlended(SCENES[1].seq, SCENES[1].seq.start);   // phones: show the first welcome frame behind "Scroll to start"
     } else if (scene.holdPrevious && SCENES[idx - 1] && SCENES[idx - 1].seq) {
       const prev = SCENES[idx - 1].seq;
       preload(SCENES[idx - 1]);

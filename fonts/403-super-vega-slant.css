@@ -1,0 +1,24 @@
+/*
+Font: 		403 Super Vega Slant
+Style: 		
+URL: 		https://youworkforthem.com/font/T27429/403-super-vega
+Foundry: 	403 TF
+Foundry: 	https://youworkforthem.com/designer/2016/403-tf
+Copyright:	
+Version: 	18
+Created:	April 03, 2026
+License: 	https://www.youworkforthem.com/font-license 
+License: 	The WebFont(s) listed in this document must follow the YouWorkForThem
+			WebFont license rules. All other parties are strictly restricted 
+			from using the WebFonts(s) listed without a purchased license. 
+			All details above must always remain unaltered and visible in your CSS.
+*/
+
+@font-face {
+	font-family: '403SuperVega-Slant';
+	src: url('403-super-vega-slant.woff2') format('woff2'),
+	     url('403-super-vega-slant.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}

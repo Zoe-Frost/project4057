@@ -6,7 +6,8 @@
   <title>4057 — Explore</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../fonts/403-super-vega-regular.css">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body data-root="../">
@@ -20,8 +21,22 @@
         <img class="snd-on" src="../images/sound-on.webp" alt="" aria-hidden="true">
         <img class="snd-off" src="../images/sound-off.webp" alt="" aria-hidden="true">
       </button>
+      <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><img src="../images/menu-icon.webp" alt=""></button>
     </nav>
   </header>
+
+  <!-- Phones held upright are asked to turn sideways -->
+  <div class="rotate-note" role="status">
+    <svg viewBox="0 0 120 100" aria-hidden="true">
+      <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b8e04a"/><stop offset="1" stop-color="#44D62C"/></linearGradient></defs>
+      <rect x="6" y="4" width="46" height="88" rx="5" fill="none" stroke="url(#rg)" stroke-width="2.5"/>
+      <rect x="22" y="48" width="92" height="46" rx="5" fill="#2fbf26"/>
+      <circle cx="32" cy="71" r="3.5" fill="#111"/>
+      <path d="M64 12c14 0 24 9 26 24" fill="none" stroke="#44D62C" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M84 31l6 6 6-7" fill="none" stroke="#44D62C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p>Please rotate your device for the best experience</p>
+  </div>
 
   <main class="experience" id="experience">
     <div class="stage">
@@ -80,5 +95,9 @@
   <audio id="ambient" src="../audio/4057-soundtrack.m4a" loop preload="none"></audio>
   <script src="../js/script.js"></script>
   <script src="../js/explore.js"></script>
+  <script>
+    // Hide the "rotate your device" message after 10 seconds
+    setTimeout(() => document.querySelector(".rotate-note").classList.add("is-dismissed"), 10000);
+  </script>
 </body>
 </html>
