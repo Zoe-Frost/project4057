@@ -46,7 +46,6 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
   const canvas = document.getElementById("frames");
   const ctx = canvas.getContext("2d");
   const fog = document.getElementById("fog");
-  const bar = document.getElementById("progress");
   const copies = {};
   document.querySelectorAll(".copy[data-scene]").forEach((el) => (copies[el.dataset.scene] = el));
 
@@ -55,34 +54,77 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
   let queued = false;
 
   /* ---------- sizing ---------- */
+  // Phones show and hide their address bar while scrolling, which changes the
+  // window height. Re-measuring on those small changes made the page jump, so the
+  // scroll length is only recalculated when the width changes (e.g. rotating).
+  const stage = canvas.parentElement;
+  let lastW = 0;
   function resize() {
-    vh = window.innerHeight;
-    wrap.style.height = `${(total + 1) * vh}px`;
+    const w = window.innerWidth;
+    if (w !== lastW) {
+      lastW = w;
+      vh = Math.max(window.innerHeight, document.documentElement.clientHeight);
+      wrap.style.height = `${Math.round((total + 1) * vh)}px`;
+    }
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(window.innerWidth * dpr);
-    canvas.height = Math.round(vh * dpr);
+    canvas.width = Math.round(stage.clientWidth * dpr);
+    canvas.height = Math.round(stage.clientHeight * dpr);
     requestRender();
   }
 
-  /* ---------- image loading ---------- */
-  const cache = new Map(); // url -> { img, ok, done }
-  function load(url) {
-    if (cache.has(url)) return cache.get(url);
-    const entry = { img: new Image(), ok: false, done: false };
-    entry.img.decoding = "async";
-    entry.img.onload = () => { entry.ok = entry.done = true; requestRender(); };
-    entry.img.onerror = () => { entry.done = true; };
-    entry.img.src = url;
-    cache.set(url, entry);
-    return entry;
+  /* ---------- image loading ----------
+     Frames load a few at a time, nearest-first: the frames just ahead of
+     where you are, then the next scenes, then everything else in the
+     background. Each frame is decoded before it's used, so drawing never
+     stalls the scroll. */
+  const MAX_ACTIVE = 6;
+  const cache = new Map(); // url -> { img, ok, done, started }
+  let active = 0, wanted = [], lastPlan = "";
+  function entryFor(url) {
+    if (!cache.has(url)) cache.set(url, { img: null, ok: false, done: false, started: false });
+    return cache.get(url);
   }
+  function start(url, e) {
+    e.started = true; active++;
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+    img.decode()
+      .then(() => { e.img = img; e.ok = true; })
+      .catch(() => {})
+      .finally(() => { e.done = true; active--; pump(); requestRender(); });
+  }
+  function pump() {
+    while (active < MAX_ACTIVE && wanted.length) {
+      const url = wanted.shift(), e = entryFor(url);
+      if (!e.started) start(url, e);
+    }
+  }
+  function load(url) { const e = entryFor(url); if (!e.started) start(url, e); return e; }
   function frameUrl(seq, n) {
     return `${seq.dir}${seq.prefix}${String(n).padStart(seq.pad, "0")}.${seq.ext}`;
   }
-  function preload(scene) {
-    if (!scene) return;
-    if (scene.still) load(scene.still);
-    if (scene.seq) for (let n = scene.seq.start; n <= scene.seq.end; n++) load(frameUrl(scene.seq, n));
+  // Re-order the download queue around the current scene and frame.
+  function plan(idx, frame) {
+    const key = idx + ":" + Math.round(frame / 4);
+    if (key === lastPlan) return;
+    lastPlan = key;
+    const list = [], seen = new Set();
+    const add = (seq, n) => { const u = frameUrl(seq, n); if (!seen.has(u)) { seen.add(u); list.push(u); } };
+    const sc = SCENES[idx];
+    if (sc && sc.seq) {
+      const f = Math.round(frame);
+      for (let n = f; n <= sc.seq.end; n++) add(sc.seq, n);          // ahead of you first
+      for (let n = f - 1; n >= sc.seq.start; n--) add(sc.seq, n);    // then behind
+    }
+    for (let i = idx + 1; i < SCENES.length; i++) {                  // upcoming scenes
+      const s = SCENES[i].seq; if (s) for (let n = s.start; n <= s.end; n++) add(s, n);
+    }
+    for (let i = idx - 1; i >= 0; i--) {                              // earlier scenes, nearest end first
+      const s = SCENES[i].seq; if (s) for (let n = s.end; n >= s.start; n--) add(s, n);
+    }
+    wanted = list.filter((u) => !entryFor(u).started);
+    pump();
   }
 
   /* ---------- timing helpers ---------- */
@@ -159,7 +201,7 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
       start += SCENES[i].length;
     }
     const scene = SCENES[idx];
-    preload(scene); preload(SCENES[idx + 1]);
+    plan(idx, scene.seq ? scene.seq.start + holdEase(t, scene.hold) * (scene.seq.end - scene.seq.start) : 0);
 
     // background
     ctx.fillStyle = "#111";
@@ -171,11 +213,9 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     } else if (scene.seq) {
       drew = drawBlended(scene.seq, scene.seq.start + holdEase(t, scene.hold) * (scene.seq.end - scene.seq.start));
     } else if (scene.id === "intro" && SCENES[1].seq) {
-      preload(SCENES[1]);
       drew = drawBlended(SCENES[1].seq, SCENES[1].seq.start);   // show the first welcome frame behind "Scroll to start"
     } else if (scene.holdPrevious && SCENES[idx - 1] && SCENES[idx - 1].seq) {
       const prev = SCENES[idx - 1].seq;
-      preload(SCENES[idx - 1]);
       // End screen: the last frame, blurred and darkened behind the text
       const k = ramp(t, 0, 0.3);
       ctx.save();
@@ -208,7 +248,6 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
       el.classList.toggle("is-on", o > 0.5);
     }
 
-    bar.style.width = `${clamp(y / total) * 100}%`;
   }
 
   // Shown while a scene's frames haven't been added yet.
