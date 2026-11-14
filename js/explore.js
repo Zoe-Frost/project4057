@@ -16,11 +16,12 @@ const SCENES = [
   // Camera tilts down from Mauao into the dark water (1–95), then black (95–110)
   { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18,
     seq: { dir: "../frames/welcome/", prefix: "frame_", start: 1, end: 110, pad: 4, ext: "webp" } },
-  // Room render: black 0–20, drawer 24–60, dive into the wires 60–84, pan to the table, pie at 112–120
-  { id: "drawer",    length: 3.5, fogIn: false, fogOut: false, hold: 0.5,
-    seq: { dir: "../frames/room/", prefix: "frame_", start: 0,  end: 80,  pad: 4, ext: "webp" } },
-  { id: "pie",       length: 2.5, fogIn: false, fogOut: "black", hold: 0.88,
-    seq: { dir: "../frames/room/", prefix: "frame_", start: 81, end: 120, pad: 4, ext: "webp" } },
+  // Room render v2 (701 frames): black 0–50, drawer 60–200, dive into the wires 220–290,
+  // pan across to the table 300–460, the pie 480–620, then fades to dark 640–700
+  { id: "drawer",    length: 5,   fogIn: false, fogOut: false, hold: 0.43,
+    seq: { dir: "../frames/room/", prefix: "frame_", start: 0,   end: 300, pad: 4, ext: "webp" } },
+  { id: "pie",       length: 6,   fogIn: false, fogOut: "black", hold: 0.67,
+    seq: { dir: "../frames/room/", prefix: "frame_", start: 301, end: 700, pad: 4, ext: "webp" } },
   // Boardwalk flows straight into the final render (its frame 1 = boardwalk frame 120)
   { id: "boardwalk", length: 3.5, fogIn: "black", fogOut: false,
     seq: { dir: "../frames/boardwalk/", prefix: "frame_", start: 1, end: 120, pad: 4, ext: "webp" } },
