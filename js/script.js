@@ -52,12 +52,31 @@
     if (p !== null) try { sessionStorage.setItem(POS_KEY, String(p)); } catch (e) {}
   }
 
-  function load() {
-    if (loading) return loading;
+  // iPhones: let the music play even when the phone is on silent mode
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+
+  function ensureCtx() {
+    if (ctx) return true;
     const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { useElement = true; return (loading = Promise.resolve()); }
+    if (!AC) { useElement = true; return false; }
     ctx = new AC();
     gain = ctx.createGain(); gain.gain.value = 0; gain.connect(ctx.destination);
+    return true;
+  }
+  // Must run straight inside a tap/click: iPhones only unlock audio there.
+  function unlockNow() {
+    if (!ensureCtx() || ctx.state === "running") return;
+    try {
+      ctx.resume();
+      const s = ctx.createBufferSource();
+      s.buffer = ctx.createBuffer(1, 1, 22050);
+      s.connect(ctx.destination); s.start(0);
+    } catch (e) {}
+  }
+
+  function load() {
+    if (loading) return loading;
+    if (!ensureCtx()) return (loading = Promise.resolve());
     loading = fetch(SRC)
       .then((r) => r.arrayBuffer())
       .then((data) => new Promise((res, rej) => ctx.decodeAudioData(data, res, rej)))
@@ -131,7 +150,7 @@
   // Until then the sound icon gently pulses as a hint.
   function blocked() { if (on) btn.classList.add("is-waiting"); }
   function ready() { btn.classList.remove("is-waiting"); }
-  const unlock = () => { if (on) play(); };
+  const unlock = () => { if (on) { unlockNow(); play(); } };
   ["pointerdown", "pointerup", "touchend", "keydown", "click"].forEach((ev) =>
     window.addEventListener(ev, unlock, { passive: true }));
 
@@ -145,6 +164,7 @@
     e.stopPropagation();
     on = !on;
     try { localStorage.setItem("4057-sound", on ? "on" : "off"); } catch (e2) {}
+    if (on) unlockNow();
     apply();
   });
 
@@ -200,4 +220,21 @@
   const update = () => nav.classList.toggle("is-scrolled", window.scrollY > 8);
   window.addEventListener("scroll", update, { passive: true });
   update();
+})();
+
+(() => {
+  // Phones: make the big 4057 logo exactly as wide as "Uncover the hidden"
+  const mark = document.querySelector(".hero-mark");
+  const title = document.querySelector(".home-copy .title");
+  if (!mark || !title) return;
+  const phone = window.matchMedia("(max-width: 760px)");
+  const fit = () => {
+    if (!phone.matches) { mark.style.width = ""; return; }
+    const range = document.createRange();
+    range.selectNodeContents(title);            // the text itself, not the full-width heading box
+    mark.style.width = `${Math.round(range.getBoundingClientRect().width)}px`;
+  };
+  fit();
+  window.addEventListener("resize", fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 })();

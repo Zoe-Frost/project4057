@@ -36,11 +36,13 @@ const SCENES = [
 ];
 
 const FOG_EDGE = 0.12;   // share of a scene spent fading through fog at each edge
-const BLEND = false;
-// Scroll smoothing: the scene glides toward where the visitor has scrolled to,
-// never faster than MAX_SPEED (screen heights per second), however fast they scroll.
-const MAX_SPEED = 1.2;
-const EASE = 3;          // higher = catches up quicker     // true = cross-fade between frames (smoother on slow moves, but smears fast ones)
+const BLEND = false;     // true = cross-fade between frames (smoother on slow moves, but smears fast ones)
+
+// Playback pace: the scenes play at a steady speed however fast someone scrolls.
+// Scrolling only says where to go; the scenes travel there at these speeds
+// (in scene lengths per second), and much slower while text is on screen.
+const PACE = 0.6;        // normal speed (raise = faster)
+const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
 
 (() => {
   const wrap = document.getElementById("experience");
@@ -64,7 +66,8 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     const w = window.innerWidth;
     if (w !== lastW) {
       lastW = w;
-      vh = Math.max(window.innerHeight, document.documentElement.clientHeight);
+      // Phones scroll much further per swipe, so each scene takes more swiping there.
+      vh = Math.max(window.innerHeight, document.documentElement.clientHeight) * (PHONE ? PHONE_SLOW : 1);
       wrap.style.height = `${Math.round((total + 1) * vh)}px`;
     }
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -83,6 +86,7 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
   // phones stutter while they kept re-preparing them.
   const PHONE = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
   const KEEP = PHONE ? 110 : Infinity;      // frames held in memory at once
+  const PHONE_SLOW = 3;                     // phones: scenes take 3x more scrolling (raise to slow down more)
   const MAX_ACTIVE = PHONE ? 4 : 6;
   const cache = new Map(); // url -> { img, ok, done, started }
   let active = 0, wanted = [], lastPlan = "";
@@ -94,11 +98,21 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     e.started = true; active++;
     const img = new Image();
     img.decoding = "async";
+    let finished = false;
+    const finish = (ok) => {
+      if (finished) return; finished = true;
+      if (ok) { e.img = img; e.ok = true; }
+      else setTimeout(() => { if (cache.get(url) === e) cache.delete(url); }, 1500);  // failed: allow a retry
+      e.done = true; active--; pump(); requestRender();
+    };
+    // iPhones sometimes reject decode() under memory pressure even though the
+    // image loaded fine, so a normal "loaded" also counts as ready.
+    img.onload = () => {
+      if (img.decode) img.decode().then(() => finish(true), () => finish(img.naturalWidth > 0));
+      else finish(true);
+    };
+    img.onerror = () => finish(false);
     img.src = url;
-    img.decode()
-      .then(() => { e.img = img; e.ok = true; })
-      .catch(() => {})
-      .finally(() => { e.done = true; active--; pump(); requestRender(); });
   }
   function pump() {
     while (active < MAX_ACTIVE && wanted.length) {
@@ -191,9 +205,27 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     return false;
   }
 
+  let everDrew = false;
   let current = null;   // smoothed scroll position, in screen heights
   let lastT = 0;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // True while a scene's text is on screen at scroll position y
+  function textOnScreenAt(y) {
+    let start = 0;
+    for (let i = 0; i < SCENES.length; i++) {
+      const s = SCENES[i], len = s.length;
+      if (y < start + len || i === SCENES.length - 1) {
+        if (!copies[s.id]) return false;
+        const t = (y - start) / len;
+        if (s.id === "intro") return false;   // "Scroll to start" doesn't need to linger
+        if (s.id === "end") return t > 0.15;
+        return t > 0.16 && t < 0.78;
+      }
+      start += len;
+    }
+    return false;
+  }
 
   function render(now = performance.now()) {
     queued = false;
@@ -201,11 +233,13 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     const dt = Math.min(0.1, (now - (lastT || now)) / 1000);
     lastT = now;
     if (current === null || reduceMotion) current = target;
-    else {
-      let step = (target - current) * (1 - Math.exp(-EASE * dt));
-      const cap = MAX_SPEED * dt;
-      current += Math.max(-cap, Math.min(cap, step));
-      if (Math.abs(target - current) < 0.0005) current = target;
+    else if (current !== target) {
+      const pace = textOnScreenAt(current) ? TEXT_PACE : PACE;
+      const gap = target - current;
+      let step = Math.sign(gap) * pace * dt;
+      // ease in to a gentle stop over the last little bit
+      if (Math.abs(gap) < 0.15) step *= Math.max(0.25, Math.abs(gap) / 0.15);
+      current = Math.abs(step) >= Math.abs(gap) ? target : current + step;
     }
     if (current !== target) requestRender();      // keep gliding until we arrive
     else lastT = 0;
@@ -222,8 +256,6 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
 
     // background
     let endBlur = 0;
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
     let drew = false;
     if (scene.still) {
       const e = load(scene.still);
@@ -239,10 +271,15 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
       const k = ramp(t, 0, 0.3);
       endBlur = k;
       drew = drawBlended(prev, prev.end);
-      ctx.fillStyle = `rgba(17,22,17,${(0.45 * k).toFixed(3)})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (drew) {
+        ctx.fillStyle = `rgba(17,22,17,${(0.45 * k).toFixed(3)})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
     }
-    if (!drew && (scene.seq || scene.still)) placeholder(scene.id);
+    // If the frame for this spot hasn't arrived yet, keep showing the last
+    // frame instead of flashing a blank screen.
+    if (drew) everDrew = true;
+    else if (!everDrew) { ctx.fillStyle = "#111"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
 
     const blurPx = Math.round(endBlur * 22);
     const f2 = blurPx ? `blur(${blurPx}px)` : "";

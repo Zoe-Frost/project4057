@@ -318,8 +318,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   /* Home */
   .home { background-position: 31% center; }
   .home::after { background: linear-gradient(to top, rgba(10,14,10,.9) 0%, rgba(10,14,10,.35) 45%, rgba(10,14,10,.1) 70%, rgba(10,14,10,.4) 100%); }
-  .home-inner { flex-direction: column; align-items: stretch; gap: 26px; bottom: 7vh; }
-  .hero-mark { width: 100%; }
+  .home-inner { flex-direction: column; align-items: stretch; gap: 26px; bottom: 3.5vh; }
+  .hero-mark { width: 100%; align-self: flex-end; }   /* width set by js/script.js to match the title */
   .home-copy { text-align: right; max-width: none; }
   .home-copy .title { font-size: clamp(22px, 7.2vw, 34px); letter-spacing: 0; }
   .home-copy .body { margin-left: auto; max-width: 330px; }
