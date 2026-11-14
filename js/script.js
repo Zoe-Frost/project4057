@@ -22,31 +22,134 @@
 })();
 
 (() => {
-  // Sound toggle: plays audio/ambient.mp3 if it exists, and remembers the choice.
+  /* Sound: the soundtrack loops with no gap and carries on from the same
+     point when you change page. The track's last ~2 seconds are its reverb
+     tail, so each new pass starts as the music ends (at LOOP_END) and the
+     tail rings out underneath it instead of leaving a quiet gap. */
   const btn = document.querySelector(".sound-btn");
-  const audio = document.getElementById("ambient");
-  if (!btn || !audio) return;
+  const el = document.getElementById("ambient");
+  if (!btn || !el) return;
+  const SRC = el.getAttribute("src");
+  const LOOP_START = 0.02, LOOP_END = 15.33, PERIOD = LOOP_END - LOOP_START;
+  const POS_KEY = "4057-sound-pos";
 
   let on = false;
   try { on = localStorage.getItem("4057-sound") === "on"; } catch (e) {}
 
+  let ctx = null, gain = null, buffer = null, loading = null;
+  let origin = 0, nextAt = 0, timer = null, sources = [];
+  let useElement = false;   // fallback when the file can't be decoded (e.g. opened from your computer)
+
+  function savedPos() {
+    let p = 0;
+    try { p = parseFloat(sessionStorage.getItem(POS_KEY)) || 0; } catch (e) {}
+    return ((p % PERIOD) + PERIOD) % PERIOD;
+  }
+  function savePos() {
+    let p = null;
+    if (ctx && buffer && timer) p = (ctx.currentTime - origin) % PERIOD;
+    else if (useElement && !el.paused) p = el.currentTime - LOOP_START;
+    if (p !== null) try { sessionStorage.setItem(POS_KEY, String(p)); } catch (e) {}
+  }
+
+  function load() {
+    if (loading) return loading;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { useElement = true; return (loading = Promise.resolve()); }
+    ctx = new AC();
+    gain = ctx.createGain(); gain.gain.value = 0; gain.connect(ctx.destination);
+    loading = fetch(SRC)
+      .then((r) => r.arrayBuffer())
+      .then((data) => new Promise((res, rej) => ctx.decodeAudioData(data, res, rej)))
+      .then((b) => { buffer = b; })
+      .catch(() => { useElement = true; });
+    return loading;
+  }
+
+  function schedule() {
+    while (nextAt < ctx.currentTime + 1.5) {
+      const s = ctx.createBufferSource();
+      s.buffer = buffer;
+      s.connect(gain);
+      const offset = LOOP_START + Math.max(0, ctx.currentTime - nextAt);
+      s.start(Math.max(nextAt, ctx.currentTime), Math.min(offset, buffer.duration - 0.05));
+      s.onended = () => { sources = sources.filter((x) => x !== s); };
+      sources.push(s);
+      nextAt += PERIOD;
+    }
+  }
+
+  function startWebAudio() {
+    const pos = savedPos();
+    origin = ctx.currentTime - pos;
+    // first pass starts part-way through, at the saved position
+    const s = ctx.createBufferSource();
+    s.buffer = buffer; s.connect(gain);
+    s.start(ctx.currentTime, LOOP_START + pos);
+    sources.push(s);
+    nextAt = origin + PERIOD;
+    schedule();
+    timer = setInterval(schedule, 500);
+    gain.gain.cancelScheduledValues(ctx.currentTime);
+    gain.gain.setTargetAtTime(1, ctx.currentTime, 0.15);   // gentle fade in
+  }
+
+  function stopWebAudio() {
+    if (!ctx) return;
+    savePos();
+    clearInterval(timer); timer = null;
+    gain.gain.cancelScheduledValues(ctx.currentTime);
+    gain.gain.setTargetAtTime(0, ctx.currentTime, 0.08);
+    const old = sources; sources = [];
+    setTimeout(() => old.forEach((s) => { try { s.stop(); } catch (e) {} }), 400);
+  }
+
+  // Fallback player: an <audio> element that jumps back before the quiet tail
+  el.addEventListener("timeupdate", () => { if (useElement && el.currentTime >= LOOP_END) el.currentTime = LOOP_START; });
+
+  function play() {
+    load().then(() => {
+      if (!on) return;
+      if (useElement) {
+        if (el.paused) { el.currentTime = LOOP_START + savedPos(); el.play().then(ready, blocked); }
+        return;
+      }
+      ctx.resume().then(() => {
+        if (!on) return;
+        if (ctx.state !== "running") return blocked();
+        if (!timer) startWebAudio();
+        ready();
+      }, blocked);
+    });
+  }
+  function stop() {
+    if (useElement) { savePos(); el.pause(); } else stopWebAudio();
+    btn.classList.remove("is-waiting");
+  }
+
+  // Browsers only allow sound after a click, tap or key press on each page.
+  // Until then the sound icon gently pulses as a hint.
+  function blocked() { if (on) btn.classList.add("is-waiting"); }
+  function ready() { btn.classList.remove("is-waiting"); }
+  const unlock = () => { if (on) play(); };
+  ["pointerdown", "pointerup", "touchend", "keydown", "click"].forEach((ev) =>
+    window.addEventListener(ev, unlock, { passive: true }));
+
   function apply() {
     btn.setAttribute("aria-pressed", String(on));
     btn.setAttribute("aria-label", on ? "Turn sound off" : "Turn sound on");
-    if (on) audio.play().catch(() => {}); else audio.pause();
+    if (on) play(); else stop();
   }
 
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
     on = !on;
-    try { localStorage.setItem("4057-sound", on ? "on" : "off"); } catch (e) {}
+    try { localStorage.setItem("4057-sound", on ? "on" : "off"); } catch (e2) {}
     apply();
   });
 
-  // Browsers block sound until the visitor interacts, so resume on first click.
-  if (on) {
-    btn.setAttribute("aria-pressed", "true");
-    window.addEventListener("pointerdown", () => audio.play().catch(() => {}), { once: true });
-  }
+  window.addEventListener("pagehide", savePos);
+  apply();   // on page load: try to carry on (works if the browser allows it)
 })();
 
 (() => {

@@ -78,7 +78,12 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
      where you are, then the next scenes, then everything else in the
      background. Each frame is decoded before it's used, so drawing never
      stalls the scroll. */
-  const MAX_ACTIVE = 6;
+  // Phones get lighter frames (frames-m/, 1152px wide) and only keep the frames
+  // around where you are in memory; holding hundreds of full-size frames made
+  // phones stutter while they kept re-preparing them.
+  const PHONE = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
+  const KEEP = PHONE ? 110 : Infinity;      // frames held in memory at once
+  const MAX_ACTIVE = PHONE ? 4 : 6;
   const cache = new Map(); // url -> { img, ok, done, started }
   let active = 0, wanted = [], lastPlan = "";
   function entryFor(url) {
@@ -103,7 +108,8 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
   }
   function load(url) { const e = entryFor(url); if (!e.started) start(url, e); return e; }
   function frameUrl(seq, n) {
-    return `${seq.dir}${seq.prefix}${String(n).padStart(seq.pad, "0")}.${seq.ext}`;
+    const dir = PHONE ? seq.dir.replace("/frames/", "/frames-m/") : seq.dir;
+    return `${dir}${seq.prefix}${String(n).padStart(seq.pad, "0")}.${seq.ext}`;
   }
   // Re-order the download queue around the current scene and frame.
   function plan(idx, frame) {
@@ -115,8 +121,10 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     const sc = SCENES[idx];
     if (sc && sc.seq) {
       const f = Math.round(frame);
-      for (let n = f; n <= sc.seq.end; n++) add(sc.seq, n);          // ahead of you first
-      for (let n = f - 1; n >= sc.seq.start; n--) add(sc.seq, n);    // then behind
+      for (let n = f; n <= Math.min(sc.seq.end, f + 90); n++) add(sc.seq, n);   // just ahead of you first
+      for (let n = f - 1; n >= Math.max(sc.seq.start, f - 20); n--) add(sc.seq, n); // a little behind
+      for (let n = f; n <= sc.seq.end; n++) add(sc.seq, n);                     // rest of this scene
+      for (let n = f - 1; n >= sc.seq.start; n--) add(sc.seq, n);
     }
     for (let i = idx + 1; i < SCENES.length; i++) {                  // upcoming scenes
       const s = SCENES[i].seq; if (s) for (let n = s.start; n <= s.end; n++) add(s, n);
@@ -124,7 +132,15 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     for (let i = idx - 1; i >= 0; i--) {                              // earlier scenes, nearest end first
       const s = SCENES[i].seq; if (s) for (let n = s.end; n >= s.start; n--) add(s, n);
     }
-    wanted = list.filter((u) => !entryFor(u).started);
+    let keep = list;
+    if (KEEP !== Infinity) {
+      keep = list.slice(0, KEEP);
+      const keepSet = new Set(keep);
+      for (const [u, e] of cache) {                 // let go of frames far from where you are
+        if (e.done && !keepSet.has(u)) cache.delete(u);
+      }
+    }
+    wanted = keep.filter((u) => !entryFor(u).started);
     pump();
   }
 
@@ -205,6 +221,7 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
     plan(idx, scene.seq ? scene.seq.start + holdEase(t, scene.hold) * (scene.seq.end - scene.seq.start) : 0);
 
     // background
+    let endBlur = 0;
     ctx.fillStyle = "#111";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     let drew = false;
@@ -217,18 +234,22 @@ const EASE = 3;          // higher = catches up quicker     // true = cross-fade
       drew = drawBlended(SCENES[1].seq, SCENES[1].seq.start);   // show the first welcome frame behind "Scroll to start"
     } else if (scene.holdPrevious && SCENES[idx - 1] && SCENES[idx - 1].seq) {
       const prev = SCENES[idx - 1].seq;
-      // End screen: the last frame, blurred and darkened behind the text
+      // End screen: the last frame, blurred and darkened behind the text.
+      // The blur is a CSS filter on the canvas so it also works on iPhones.
       const k = ramp(t, 0, 0.3);
-      ctx.save();
-      ctx.filter = `blur(${Math.round(40 * k * (canvas.width / 1920))}px)`;
-      const pad = 1 + 0.08 * k;                    // scale up slightly so blurred edges stay filled
-      ctx.translate(canvas.width / 2, canvas.height / 2); ctx.scale(pad, pad); ctx.translate(-canvas.width / 2, -canvas.height / 2);
+      endBlur = k;
       drew = drawBlended(prev, prev.end);
-      ctx.restore();
       ctx.fillStyle = `rgba(17,22,17,${(0.45 * k).toFixed(3)})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
     if (!drew && (scene.seq || scene.still)) placeholder(scene.id);
+
+    const blurPx = Math.round(endBlur * 22);
+    const f2 = blurPx ? `blur(${blurPx}px)` : "";
+    if (canvas.style.filter !== f2) {
+      canvas.style.filter = f2;
+      canvas.style.transform = blurPx ? `scale(${(1 + 0.06 * endBlur).toFixed(3)})` : "";
+    }
 
     // fog between scenes
     let f = 0, black = false;
