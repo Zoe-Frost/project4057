@@ -238,3 +238,24 @@
   window.addEventListener("resize", fit);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 })();
+
+// Behind the scenes: each heading, paragraph and image fades and slides up
+// the first time it scrolls into view (items in the same section follow one after another).
+(() => {
+  const page = document.querySelector(".about-page");
+  if (!page || !("IntersectionObserver" in window)) return;
+  const items = page.querySelectorAll(
+    ".about-hero h1, .about-hero p, .title, .about-text p, .about-img, .values-intro, .values-list li, .contact-info p, .contact-form, .faq-list details"
+  );
+  const seen = new Map();
+  items.forEach((el) => {
+    const sec = el.closest("section");
+    const i = seen.get(sec) || 0; seen.set(sec, i + 1);
+    el.style.setProperty("--delay", `${Math.min(i, 5) * 0.12}s`);
+    el.classList.add("reveal");
+  });
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } });
+  }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+  items.forEach((el) => io.observe(el));
+})();

@@ -213,7 +213,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .about-row {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "title ." "img text";
-  column-gap: 7vw; row-gap: 14px; padding: 110px var(--gutter);
+  column-gap: 7vw; row-gap: 14px; padding: 170px var(--gutter);
 }
 .about-row > .title { grid-area: title; }
 .about-row .about-img { grid-area: img; }
@@ -225,7 +225,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .values {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "title list" "intro list"; column-gap: 7vw;
-  padding: 120px var(--gutter);
+  padding: 200px var(--gutter);
   background: radial-gradient(ellipse 70% 50% at 50% 50%, #2f4834 0%, #1a281d 55%, var(--bg) 100%);
 }
 .values > .title { grid-area: title; }
@@ -235,7 +235,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   padding: 26px 0 10px; border-bottom: 1px solid var(--green); font-size: var(--fs-value); font-weight: 400; }
 .values-list .num { font-family: var(--display); font-size: var(--fs-num); font-weight: normal; }
 
-.contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 7vw; align-items: start; padding: 110px var(--gutter); }
+.contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 7vw; align-items: start; padding: 180px var(--gutter); }
 .contact-info p { margin-top: 8px; max-width: 420px; font-size: var(--fs-body); font-weight: 300; line-height: 1.2; }
 .contact-form { display: flex; flex-direction: column; gap: 14px; margin-top: 30px;
   border: 1px solid var(--green); border-radius: 14px; padding: 34px; }
@@ -252,7 +252,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hidden-field { position: absolute; left: -9999px; }
 .form-thanks { color: var(--green); font-size: 14px; }
 
-.faqs { padding: 60px var(--gutter) 160px; }
+.faqs { padding: 120px var(--gutter) 200px; }
 .faq-list { display: flex; flex-direction: column; margin-top: 40px; }
 .faq-list details { border-bottom: 1px solid #cfcfcf; }
 .faq-list summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
@@ -263,9 +263,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .faq-list details p { font-size: var(--fs-body); font-weight: 300; line-height: 1.35; padding: 8px 0 20px; max-width: 1000px; color: var(--muted); }
 .faq-list a { color: var(--green); }
 
-.footer { padding: 0 var(--gutter) 30px; }
+.footer { padding: 50px var(--gutter) 30px; background: #000; }
 .footer-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "pages mail" "pages logo";
-  border-top: 1px solid #8a8a8a; padding-top: 26px; row-gap: 22px; }
+  row-gap: 22px; }
 .footer h3 { font-size: var(--fs-sm); font-weight: 400; text-transform: uppercase; margin-bottom: 10px; }
 .foot-pages { grid-area: pages; }
 .foot-mail { grid-area: mail; text-align: right; }
@@ -322,8 +322,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .hero-mark { width: 100%; align-self: flex-end; }   /* width set by js/script.js to match the title */
   .home-copy { text-align: right; max-width: none; }
   .home-copy .title { font-size: clamp(22px, 7.2vw, 34px); letter-spacing: 0; }
-  .home-copy .body { margin-left: auto; max-width: 330px; }
-  .home-copy .btn { margin-top: 30px; }
+  .home-copy .body { margin-left: auto; max-width: 330px; margin-top: 8px; line-height: 1.25; }   /* spacing from the phone Figma */
+  .home-copy .btn { margin-top: 34px; }
   .biz .title { padding-top: 0; }
   .biz-services .btn { align-self: flex-end; }
   .contact-form .btn { margin-top: 26px; }
@@ -353,22 +353,22 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .biz-services { flex-direction: column; align-items: stretch; gap: 30px; }
 
   /* About: everything in one column */
-  .about-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "text" "img"; padding: 70px var(--gutter) 50px; row-gap: 16px; }
+  .about-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "text" "img"; padding: 110px var(--gutter) 80px; row-gap: 16px; }
   .about-row .about-img { margin-top: 30px; }
   .story-photo { width: 100%; aspect-ratio: 16 / 11; }
   .mission-art { aspect-ratio: 16 / 8; }
-  .values { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "intro" "list"; row-gap: 14px; padding: 70px var(--gutter) 90px; }
+  .values { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "intro" "list"; row-gap: 14px; padding: 130px var(--gutter) 130px; }
   .values-intro { max-width: none; }
-  .contact { grid-template-columns: minmax(0, 1fr); padding: 120px var(--gutter) 80px;
+  .contact { grid-template-columns: minmax(0, 1fr); padding: 150px var(--gutter) 110px;
     background: radial-gradient(ellipse 100% 45% at 50% 40%, #2a4130 0%, #18261c 50%, var(--bg) 100%); }
   .contact-form { border: 0; padding: 0; gap: 16px; }
   .contact-form .row { gap: 20px; }
   .contact-form input, .contact-form textarea { border-radius: 10px; padding: 10px 12px; font-size: 16px; }   /* 16px stops iPhones zooming in on tap */
   .contact-form textarea { min-height: 112px; }
-  .faqs { padding: 80px var(--gutter) 90px; }
+  .faqs { padding: 110px var(--gutter) 130px; }
   .faq-list .faq-small { order: -1; }          /* phone order: "Can I get my business..." second */
   .faq-list details:first-of-type { order: -2; }
-  .footer { padding: 30px var(--gutter) 40px; background: radial-gradient(ellipse 100% 60% at 50% 20%, #23362a 0%, var(--bg) 70%); }
+  .footer { padding: 40px var(--gutter) 40px; }
   .footer-cols .footer-logo img { width: 130px; }
   .copyright { margin-top: -22px; }
 }
@@ -388,3 +388,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 
 
+
+/* Behind the scenes: text and images glide up into place as you scroll to them */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); transition-delay: var(--delay, 0s); }
+.reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }

@@ -71,8 +71,8 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
       wrap.style.height = `${Math.round((total + 1) * vh)}px`;
     }
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(stage.clientWidth * dpr);
-    canvas.height = Math.round(stage.clientHeight * dpr);
+    const cw = Math.round(stage.clientWidth * dpr), ch = Math.round(stage.clientHeight * dpr);
+    if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
     requestRender();
   }
 
@@ -85,9 +85,9 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
   // around where you are in memory; holding hundreds of full-size frames made
   // phones stutter while they kept re-preparing them.
   const PHONE = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
-  const KEEP = PHONE ? 110 : Infinity;      // frames held in memory at once
+  const KEEP = PHONE ? 75 : Infinity;       // phones only hold the frames around where you are
   const PHONE_SLOW = 3;                     // phones: scenes take 3x more scrolling (raise to slow down more)
-  const MAX_ACTIVE = PHONE ? 4 : 6;
+  const MAX_ACTIVE = 6;
   const cache = new Map(); // url -> { img, ok, done, started }
   let active = 0, wanted = [], lastPlan = "";
   function entryFor(url) {
@@ -126,35 +126,31 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
     return `${dir}${seq.prefix}${String(n).padStart(seq.pad, "0")}.${seq.ext}`;
   }
   // Re-order the download queue around the current scene and frame.
+  // The frames just ahead come first, and that run carries on into the next
+  // scene so scene changes are ready before you reach them.
+  const AHEAD = PHONE ? 60 : 90, BEHIND = PHONE ? 15 : 20;
   function plan(idx, frame) {
     const key = idx + ":" + Math.round(frame / 4);
     if (key === lastPlan) return;
     lastPlan = key;
     const list = [], seen = new Set();
     const add = (seq, n) => { const u = frameUrl(seq, n); if (!seen.has(u)) { seen.add(u); list.push(u); } };
+    const f = Math.round(frame);
+    let ahead = 0;
+    for (let i = idx; i < SCENES.length && ahead < AHEAD; i++) {     // just ahead of you, into the next scenes
+      const s = SCENES[i].seq; if (!s) continue;
+      for (let n = i === idx ? Math.max(f, s.start) : s.start; n <= s.end && ahead < AHEAD; n++) { add(s, n); ahead++; }
+    }
     const sc = SCENES[idx];
-    if (sc && sc.seq) {
-      const f = Math.round(frame);
-      for (let n = f; n <= Math.min(sc.seq.end, f + 90); n++) add(sc.seq, n);   // just ahead of you first
-      for (let n = f - 1; n >= Math.max(sc.seq.start, f - 20); n--) add(sc.seq, n); // a little behind
-      for (let n = f; n <= sc.seq.end; n++) add(sc.seq, n);                     // rest of this scene
-      for (let n = f - 1; n >= sc.seq.start; n--) add(sc.seq, n);
+    if (sc && sc.seq) for (let n = f - 1; n >= Math.max(sc.seq.start, f - BEHIND); n--) add(sc.seq, n); // a little behind
+    if (KEEP === Infinity) {                                         // computers: then everything else
+      for (let i = idx; i < SCENES.length; i++) { const s = SCENES[i].seq; if (s) for (let n = s.start; n <= s.end; n++) add(s, n); }
+      for (let i = idx - 1; i >= 0; i--) { const s = SCENES[i].seq; if (s) for (let n = s.end; n >= s.start; n--) add(s, n); }
+    } else {                                                         // phones: let go of frames far from where you are
+      const keepSet = new Set(list);
+      for (const [u, e] of cache) if (e.done && !keepSet.has(u)) cache.delete(u);
     }
-    for (let i = idx + 1; i < SCENES.length; i++) {                  // upcoming scenes
-      const s = SCENES[i].seq; if (s) for (let n = s.start; n <= s.end; n++) add(s, n);
-    }
-    for (let i = idx - 1; i >= 0; i--) {                              // earlier scenes, nearest end first
-      const s = SCENES[i].seq; if (s) for (let n = s.end; n >= s.start; n--) add(s, n);
-    }
-    let keep = list;
-    if (KEEP !== Infinity) {
-      keep = list.slice(0, KEEP);
-      const keepSet = new Set(keep);
-      for (const [u, e] of cache) {                 // let go of frames far from where you are
-        if (e.done && !keepSet.has(u)) cache.delete(u);
-      }
-    }
-    wanted = keep.filter((u) => !entryFor(u).started);
+    wanted = list.filter((u) => !entryFor(u).started);
     pump();
   }
 
@@ -205,6 +201,33 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
     return false;
   }
 
+  // Which frame belongs at scroll position y, and is it ready to show?
+  function frameReady(y) {
+    let start = 0;
+    for (let i = 0; i < SCENES.length; i++) {
+      const s = SCENES[i];
+      if (y < start + s.length || i === SCENES.length - 1) {
+        const t = clamp((y - start) / s.length);
+        let seq = null, n = 0;
+        if (s.seq) { seq = s.seq; n = Math.round(seq.start + holdEase(t, s.hold) * (seq.end - seq.start)); }
+        else if (s.id === "intro" && SCENES[1].seq) { seq = SCENES[1].seq; n = seq.start; }
+        else if (s.holdPrevious && SCENES[i - 1] && SCENES[i - 1].seq) { seq = SCENES[i - 1].seq; n = seq.end; }
+        if (!seq) return true;
+        const e = cache.get(frameUrl(seq, n));
+        return !!(e && e.ok);
+      }
+      start += s.length;
+    }
+    return true;
+  }
+  let stallSince = 0;
+  const MAX_LAG = 0.2;          // how far the page may run ahead of the scene (in scene-lengths)
+  let lastUserScroll = 0, setY = -1;
+  function setScroll(y) {
+    setY = Math.round(y * vh);
+    window.scrollTo(0, setY);
+  }
+
   let everDrew = false;
   let current = null;   // smoothed scroll position, in screen heights
   let lastT = 0;
@@ -232,16 +255,32 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
     const target = window.scrollY / vh;
     const dt = Math.min(0.1, (now - (lastT || now)) / 1000);
     lastT = now;
+    const idle = now - lastUserScroll > 160;      // the person has stopped scrolling
     if (current === null || reduceMotion) current = target;
-    else if (current !== target) {
+    else if (idle && Math.abs(target - current) > 0.04) {
+      // Stopped scrolling: the scene stops too (no auto-playing to catch up),
+      // and the page is lined back up with where the scene actually is.
+      setScroll(current);
+      stallSince = 0;
+    } else if (current !== target) {
       const pace = textOnScreenAt(current) ? TEXT_PACE : PACE;
       const gap = target - current;
       let step = Math.sign(gap) * pace * dt;
       // ease in to a gentle stop over the last little bit
       if (Math.abs(gap) < 0.15) step *= Math.max(0.25, Math.abs(gap) / 0.15);
-      current = Math.abs(step) >= Math.abs(gap) ? target : current + step;
+      let next = Math.abs(step) >= Math.abs(gap) ? target : current + step;
+      // If the next frame hasn't downloaded yet, pause briefly and wait for it
+      // rather than jumping ahead to whatever frame is ready.
+      if (!frameReady(next)) {
+        if (!stallSince) stallSince = now;
+        if (now - stallSince < 1500) next = current;
+      } else stallSince = 0;
+      current = next;
+      // Speed limit: scrolling faster than the scene moves doesn't build up
+      // a backlog; the page is held just ahead of the scene.
+      if (Math.abs(target - current) > MAX_LAG) setScroll(current + Math.sign(target - current) * MAX_LAG);
     }
-    if (current !== target) requestRender();      // keep gliding until we arrive
+    if (current !== target && !(idle && Math.abs(target - current) > 0.04)) requestRender();   // keep gliding until we arrive
     else lastT = 0;
     const y = current;                             // scroll position in screen heights
     let start = 0, idx = SCENES.length - 1, t = 1;
@@ -324,7 +363,10 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
     if (!queued) { queued = true; requestAnimationFrame(render); }
   }
 
-  window.addEventListener("scroll", requestRender, { passive: true });
+  window.addEventListener("scroll", () => {
+    if (Math.abs(window.scrollY - setY) > 2) lastUserScroll = performance.now();   // ignore our own scrollTo
+    requestRender();
+  }, { passive: true });
   window.addEventListener("resize", resize);
   resize();
 })();
