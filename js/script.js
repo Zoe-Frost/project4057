@@ -264,11 +264,25 @@
   items.forEach((el) => {
     const sec = el.closest("section");
     const i = seen.get(sec) || 0; seen.set(sec, i + 1);
-    el.style.setProperty("--delay", `${Math.min(i, 5) * 0.12}s`);
+    el.style.setProperty("--delay", `${Math.min(i, 6) * 0.15}s`);
     el.classList.add("reveal");
   });
+  // Images start fully covered (so the browser can't "see" them yet); they are
+  // watched through a stand-in box in the same spot instead.
+  const watch = new Map();
+  items.forEach((el) => {
+    let target = el;
+    if (el.classList.contains("about-img")) {
+      target = document.createElement("span");
+      target.style.cssText = "position:absolute;inset:0;pointer-events:none;";
+      const holder = document.createElement("div");
+      holder.style.cssText = "position:relative;grid-area:img;";
+      el.parentNode.insertBefore(holder, el); holder.appendChild(el); holder.appendChild(target);
+    }
+    watch.set(target, el);
+  });
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } });
-  }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
-  items.forEach((el) => io.observe(el));
+    entries.forEach((e) => { if (e.isIntersecting) { watch.get(e.target).classList.add("is-in"); io.unobserve(e.target); } });
+  }, { threshold: 0.2, rootMargin: "0px 0px -12% 0px" });
+  watch.forEach((_, t) => io.observe(t));
 })();
