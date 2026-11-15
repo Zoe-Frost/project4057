@@ -88,7 +88,7 @@
           <label class="label" for="question">Message</label>
           <textarea id="question" name="question" rows="7" placeholder="Send us your message" required></textarea>
         </div>
-        <p class="form-thanks" hidden>Thanks, your question has been sent. We'll get back to you soon.</p>
+        <p class="form-thanks" role="status" hidden>Your question has been submitted. We will get back to you as soon as possible. Thank you!</p>
         <button class="btn" type="submit">Submit</button>
       </form>
     </section>
@@ -138,10 +138,29 @@
     document.querySelectorAll(".faq-list details").forEach((d, _, all) => {
       d.addEventListener("toggle", () => { if (d.open) all.forEach((o) => o !== d && (o.open = false)); });
     });
-    // Show a thank-you message after Netlify redirects back here
-    if (new URLSearchParams(location.search).has("sent")) {
-      document.querySelector(".form-thanks").hidden = false;
-    }
+    // Contact form: send it to Netlify in the background and show a thank-you
+    // message here, instead of leaving the page.
+    const form = document.querySelector(".contact-form");
+    const thanks = form.querySelector(".form-thanks");
+    const submit = form.querySelector('button[type="submit"]');
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      submit.disabled = true; submit.textContent = "Sending...";
+      try {
+        const res = await fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(new FormData(form)).toString(),
+        });
+        if (!res.ok) throw new Error(res.status);
+        form.reset();
+        thanks.textContent = "Your question has been submitted. We will get back to you as soon as possible. Thank you!";
+      } catch (err) {
+        thanks.textContent = "Sorry, that didn't send. Please try again, or email us at Contact@proj4057.com.";
+      }
+      thanks.hidden = false;
+      submit.disabled = false; submit.textContent = "Submit";
+    });
   </script>
 </body>
 </html>

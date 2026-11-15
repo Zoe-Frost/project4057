@@ -52,6 +52,14 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
   const copies = {};
   document.querySelectorAll(".copy[data-scene]").forEach((el) => (copies[el.dataset.scene] = el));
 
+  // End screen timing. Laptops hold the last Mauao frame clear for a while first;
+  // phones bring "Uncover the hidden" up within about one swipe of the last frame.
+  const SMALL_SCREEN = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
+  const END = SMALL_SCREEN
+    ? { length: 0.8, blur: [0.08, 0.3],  text: [0.22, 0.42], slow: 0.2 }
+    : { length: 2.6, blur: [0.42, 0.62], text: [0.55, 0.72], slow: 0.5 };
+  SCENES.find((s) => s.id === "end").length = END.length;
+
   const total = SCENES.reduce((s, sc) => s + sc.length, 0);
   let vh = window.innerHeight;
   let queued = false;
@@ -245,7 +253,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
         if (!copies[s.id]) return false;
         const t = (y - start) / len;
         if (s.id === "intro") return false;   // "Scroll to start" doesn't need to linger
-        if (s.id === "end") return t > 0.5;
+        if (s.id === "end") return t > END.slow;
         return t > 0.16 && t < 0.78;
       }
       start += len;
@@ -310,7 +318,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
       const prev = SCENES[idx - 1].seq;
       // End screen: the last frame, blurred and darkened behind the text.
       // The blur is a CSS filter on the canvas so it also works on iPhones.
-      const k = ramp(t, 0.42, 0.62);   // holds the last Mauao frame clear first, then blurs
+      const k = ramp(t, END.blur[0], END.blur[1]);   // holds the last Mauao frame clear first, then blurs
       endBlur = k;
       drew = drawBlended(prev, prev.end);
       if (drew) {
@@ -342,7 +350,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
       let o = 0;
       if (id === scene.id) {
         if (id === "intro") o = 1 - ramp(t, 0.55, 0.85);
-        else if (id === "end") o = ramp(t, 0.55, 0.72);
+        else if (id === "end") o = ramp(t, END.text[0], END.text[1]);
         else o = ramp(t, 0.18, 0.3) * (1 - ramp(t, 0.62, 0.76));
       }
       el.style.opacity = o.toFixed(3);

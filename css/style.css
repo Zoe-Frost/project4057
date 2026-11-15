@@ -251,7 +251,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .contact-form input:focus, .contact-form textarea:focus { border-color: var(--green); }
 .contact-form .btn { align-self: flex-end; margin-top: 16px; }
 .hidden-field { position: absolute; left: -9999px; }
-.form-thanks { color: var(--green); font-size: 14px; }
+.form-thanks { color: var(--green); font-size: var(--fs-body); font-weight: 300; line-height: 1.3; }
 
 .faqs { padding: 120px var(--gutter) 200px; }
 .faq-list { display: flex; flex-direction: column; margin-top: 40px; }
