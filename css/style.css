@@ -311,6 +311,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .only-desktop { display: none !important; }
   .nav { background: linear-gradient(to bottom, rgba(10, 14, 10, .7), rgba(10, 14, 10, 0)); }
   .copy .body { font-size: 16px; }
+  .btn { font-size: 16px; }   /* button text on phones */
   .nav-links a, .nav-links .sound-btn { display: none; }
   .menu-btn { display: block; width: clamp(30px, calc(30px + 14 * (100vw - 360px) / 1080), 44px); }
   .menu-btn img { width: 100%; height: auto; }
@@ -346,7 +347,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .rotate-note p { font-size: var(--fs-body); font-weight: 300; }
 
   /* Map: title on top, then the map box */
-  .map-page { grid-template-columns: 1fr; grid-template-areas: "intro" "box"; align-items: start; gap: 34px; padding-bottom: 28px; }
+  .map-page { grid-template-columns: 1fr; grid-template-areas: "intro" "box"; align-items: start; gap: 34px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom)); }   /* room below the map box so Safari's bottom bar never covers it */
   .map-art, .map-panel { border-radius: 20px; }
   .map-art { height: 66vh; min-height: 460px; }
   .map-panel { height: auto; min-height: max(66vh, 460px); }
@@ -394,3 +396,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .reveal { opacity: 0; transform: translateY(40px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); transition-delay: var(--delay, 0s); }
 .reveal.is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+/* No outline box after tapping or clicking (keyboard users still get one) */
+.menu-btn:focus:not(:focus-visible), .menu-close:focus:not(:focus-visible), .sound-btn:focus:not(:focus-visible),
+.menu-list summary:focus:not(:focus-visible), .menu-setting:focus:not(:focus-visible) { outline: none; }
+.menu-btn, .menu-close, .sound-btn { -webkit-tap-highlight-color: transparent; }

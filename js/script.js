@@ -61,6 +61,9 @@
     if (!AC) { useElement = true; return false; }
     ctx = new AC();
     gain = ctx.createGain(); gain.gain.value = 0; gain.connect(ctx.destination);
+    // If the browser pauses the sound part-way (another app, a call, switching
+    // tabs, iPhone audio interruptions), start it again straight away.
+    ctx.onstatechange = () => { if (on && ctx.state !== "running" && ctx.state !== "closed") revive(); };
     return true;
   }
   // Must run straight inside a tap/click: iPhones only unlock audio there.
@@ -74,6 +77,14 @@
     } catch (e) {}
   }
 
+  function revive() {
+    if (!on || !ctx) return;
+    ctx.resume().then(() => { if (timer) schedule(); ready(); }, blocked);
+    setTimeout(() => { if (on && ctx.state !== "running") blocked(); }, 600);
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && on) { if (timer) revive(); else play(); } });
+  window.addEventListener("pageshow", (e) => { if (e.persisted && on) revive(); });   // coming back with the Back button
+
   function load() {
     if (loading) return loading;
     if (!ensureCtx()) return (loading = Promise.resolve());
@@ -86,7 +97,7 @@
   }
 
   function schedule() {
-    while (nextAt < ctx.currentTime + 1.5) {
+    while (nextAt < ctx.currentTime + 6) {     // passes are queued 6s ahead, so a busy page can't cause a gap
       const s = ctx.createBufferSource();
       s.buffer = buffer;
       s.connect(gain);
@@ -108,7 +119,7 @@
     sources.push(s);
     nextAt = origin + PERIOD;
     schedule();
-    timer = setInterval(schedule, 500);
+    timer = setInterval(schedule, 250);
     gain.gain.cancelScheduledValues(ctx.currentTime);
     gain.gain.setTargetAtTime(1, ctx.currentTime, 0.15);   // gentle fade in
   }
@@ -206,11 +217,13 @@
   };
   soundSetting.addEventListener("click", () => { if (soundBtn) soundBtn.click(); showSound(); });
 
-  const open = () => { showSound(); menu.classList.add("is-open"); btn.setAttribute("aria-expanded", "true"); document.body.style.overflow = "hidden"; menu.querySelector(".menu-close").focus(); };
-  const close = () => { menu.classList.remove("is-open"); btn.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; btn.focus(); };
+  const open = () => { showSound(); menu.classList.add("is-open"); btn.setAttribute("aria-expanded", "true"); document.body.style.overflow = "hidden"; menu.querySelector(".menu-close").focus({ focusVisible: false }); };
+  // Only put the keyboard focus back on the menu icon when closed with the keyboard,
+  // so tapping/clicking doesn't leave an outline box around it.
+  const close = (byKeyboard) => { menu.classList.remove("is-open"); btn.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; if (byKeyboard === true) btn.focus(); else btn.blur(); };
   btn.addEventListener("click", open);
-  menu.querySelector(".menu-close").addEventListener("click", close);
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menu.classList.contains("is-open")) close(); });
+  menu.querySelector(".menu-close").addEventListener("click", () => close(false));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menu.classList.contains("is-open")) close(true); });
 })();
 
 (() => {

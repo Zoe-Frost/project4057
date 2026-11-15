@@ -73,10 +73,19 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
   function resize() {
     const w = window.innerWidth;
     if (w !== lastW) {
+      const first = lastW === 0;
       lastW = w;
       // Phones scroll much further per swipe, so each scene takes more swiping there.
       vh = Math.max(window.innerHeight, document.documentElement.clientHeight) * (PHONE ? PHONE_SLOW : 1);
       wrap.style.height = `${Math.round((total + 1) * vh)}px`;
+      // Turning the phone changes the page size; keep the experience exactly
+      // where it was instead of letting it skip to a different part.
+      if (!first && current !== null) {
+        const keep = current, at = performance.now();
+        ignoreScrollUntil = at + 700;      // the browser's own scroll jumps while turning don't count
+        const put = () => { if (lastUserScroll < at) setScroll(keep); };
+        put(); requestAnimationFrame(put); setTimeout(put, 250); setTimeout(put, 600);
+      }
     }
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const cw = Math.round(stage.clientWidth * dpr), ch = Math.round(stage.clientHeight * dpr);
@@ -233,7 +242,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
   }
   let stallSince = 0;
   const MAX_LAG = 0.2;          // how far the page may run ahead of the scene (in scene-lengths)
-  let lastUserScroll = 0, setY = -1;
+  let lastUserScroll = 0, setY = -1, ignoreScrollUntil = 0;
   function setScroll(y) {
     setY = Math.round(y * vh);
     window.scrollTo(0, setY);
@@ -375,7 +384,8 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
   }
 
   window.addEventListener("scroll", () => {
-    if (Math.abs(window.scrollY - setY) > 2) lastUserScroll = performance.now();   // ignore our own scrollTo
+    const t = performance.now();
+    if (t > ignoreScrollUntil && Math.abs(window.scrollY - setY) > 2) lastUserScroll = t;   // ignore our own scrollTo
     requestRender();
   }, { passive: true });
   window.addEventListener("resize", resize);
