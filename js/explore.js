@@ -29,7 +29,7 @@ const SCENES = [
   // over the top, dive into the ocean (~400) and rise to the final view of the Mount (450)
   { id: "pilotbay",  length: 4.5, fogIn: false, fogOut: false, hold: 0.7,
     seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 1,   end: 170, pad: 4, ext: "webp" } },
-  { id: "mauao",     length: 7.5, fogIn: false, fogOut: false, hold: 0.25,
+  { id: "mauao",     length: 10, fogIn: false, fogOut: false, hold: 0.25,
     seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 171, end: 450, pad: 4, ext: "webp" } },
   // End screen holds on the last frame, darkened behind the text
   { id: "end",       length: 2.6, fogIn: false, holdPrevious: true },
@@ -135,7 +135,10 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
     lastPlan = key;
     const list = [], seen = new Set();
     const add = (seq, n) => { const u = frameUrl(seq, n); if (!seen.has(u)) { seen.add(u); list.push(u); } };
-    const f = Math.round(frame);
+    let f = Math.round(frame);
+    if (!SCENES[idx].seq && SCENES[idx].holdPrevious && SCENES[idx - 1] && SCENES[idx - 1].seq) {
+      idx = idx - 1; f = SCENES[idx].seq.end;     // end screen: keep the last frame of the final render loaded
+    }
     let ahead = 0;
     for (let i = idx; i < SCENES.length && ahead < AHEAD; i++) {     // just ahead of you, into the next scenes
       const s = SCENES[i].seq; if (!s) continue;

@@ -91,11 +91,17 @@
   <script src="../js/script.js"></script>
   <script src="../js/explore.js"></script>
   <script>
-    // After 10 seconds, fade out the "rotate your device" message and the "Scroll to start" prompt
-    setTimeout(() => {
-      document.querySelector(".rotate-note").classList.add("is-dismissed");
-      document.querySelector(".copy.intro").classList.add("is-timed-out");
-    }, 10000);
+    // "Rotate your device" goes away as soon as the phone is turned sideways,
+    // or after 5 seconds if it isn't, and doesn't come back.
+    const note = document.querySelector(".rotate-note");
+    const dismiss = () => note.classList.add("is-dismissed");
+    const sideways = window.matchMedia("(orientation: landscape)");
+    if (sideways.matches) dismiss();
+    sideways.addEventListener ? sideways.addEventListener("change", (e) => { if (e.matches) dismiss(); })
+                              : sideways.addListener((e) => { if (e.matches) dismiss(); });
+    setTimeout(dismiss, 5000);
+    // After 10 seconds, fade out the "Scroll to start" prompt
+    setTimeout(() => document.querySelector(".copy.intro").classList.add("is-timed-out"), 10000);
   </script>
 </body>
 </html>

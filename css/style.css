@@ -78,8 +78,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   color: var(--green); font-size: 15px; font-weight: 400;
   transition: box-shadow .25s;
 }
-.btn:hover, .btn:focus-visible { /* outline glows, button stays see-through */
-  box-shadow: 0 0 10px rgba(68, 214, 44, .7), inset 0 0 6px rgba(68, 214, 44, .35); outline: none;
+.btn:hover, .btn:focus-visible, .btn:active { /* outline glows, button stays see-through */
+  box-shadow: 0 0 6px rgba(68, 214, 44, 1), 0 0 18px rgba(68, 214, 44, .85), 0 0 36px rgba(68, 214, 44, .45),
+              inset 0 0 10px rgba(68, 214, 44, .55); outline: none;
 }
 
 /* ---------- Home ---------- */
@@ -139,6 +140,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .end-copy .title { white-space: normal; }
 .end-copy .body { margin-top: 18px; }
 .end-copy .btn { margin-top: 28px; }
+.copy .body { font-size: 20px; }   /* Explore body text: 20px on laptops, 16px on phones */
 .copy .title, .copy .body { text-shadow: 0 1px 14px rgba(0,0,0,.65), 0 0 2px rgba(0,0,0,.4); } /* legible over bright frames */
 
 .intro { left: 50%; top: auto; bottom: 12vh; transform: translateX(-50%); width: auto; text-align: center; }
@@ -226,7 +228,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .values {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "title list" "intro list"; column-gap: 7vw;
   padding: 200px var(--gutter);
-  background: radial-gradient(ellipse 70% 50% at 50% 50%, #2f4834 0%, #1a281d 55%, var(--bg) 100%);
 }
 .values > .title { grid-area: title; }
 .values-intro { grid-area: intro; align-self: end; font-size: var(--fs-body); font-weight: 300; line-height: 1.25; max-width: 400px; }
@@ -263,9 +264,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .faq-list details p { font-size: var(--fs-body); font-weight: 300; line-height: 1.35; padding: 8px 0 20px; max-width: 1000px; color: var(--muted); }
 .faq-list a { color: var(--green); }
 
-.footer { padding: 50px var(--gutter) 30px; background: #000; }
+.footer { padding: 0 var(--gutter) 30px; background: var(--bg); }   /* same colour as the page */
 .footer-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "pages mail" "pages logo";
-  row-gap: 22px; }
+  border-top: 1px solid #fff; padding-top: 26px; row-gap: 22px; }   /* white line just above the footer */
 .footer h3 { font-size: var(--fs-sm); font-weight: 400; text-transform: uppercase; margin-bottom: 10px; }
 .foot-pages { grid-area: pages; }
 .foot-mail { grid-area: mail; text-align: right; }
@@ -309,6 +310,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .only-mobile { display: revert; }
   .only-desktop { display: none !important; }
   .nav { background: linear-gradient(to bottom, rgba(10, 14, 10, .7), rgba(10, 14, 10, 0)); }
+  .copy .body { font-size: 16px; }
   .nav-links a, .nav-links .sound-btn { display: none; }
   .menu-btn { display: block; width: clamp(30px, calc(30px + 14 * (100vw - 360px) / 1080), 44px); }
   .menu-btn img { width: 100%; height: auto; }
@@ -359,8 +361,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .mission-art { aspect-ratio: 16 / 8; }
   .values { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "intro" "list"; row-gap: 14px; padding: 130px var(--gutter) 130px; }
   .values-intro { max-width: none; }
-  .contact { grid-template-columns: minmax(0, 1fr); padding: 150px var(--gutter) 110px;
-    background: radial-gradient(ellipse 100% 45% at 50% 40%, #2a4130 0%, #18261c 50%, var(--bg) 100%); }
+  .contact { grid-template-columns: minmax(0, 1fr); padding: 150px var(--gutter) 110px; }
   .contact-form { border: 0; padding: 0; gap: 16px; }
   .contact-form .row { gap: 20px; }
   .contact-form input, .contact-form textarea { border-radius: 10px; padding: 10px 12px; font-size: 16px; }   /* 16px stops iPhones zooming in on tap */
@@ -368,7 +369,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .faqs { padding: 110px var(--gutter) 130px; }
   .faq-list .faq-small { order: -1; }          /* phone order: "Can I get my business..." second */
   .faq-list details:first-of-type { order: -2; }
-  .footer { padding: 40px var(--gutter) 40px; }
+  .footer { padding: 0 var(--gutter) 40px; }
   .footer-cols .footer-logo img { width: 130px; }
   .copyright { margin-top: -22px; }
 }
@@ -377,10 +378,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (max-height: 500px) and (orientation: landscape) {
   .rotate-note { display: none !important; }   /* already sideways: no need to ask */
   .copy .title { font-size: 22px; }
-  .copy .body { font-size: 13px; margin-top: 10px; }
+  .copy .body { font-size: 16px; margin-top: 10px; }
   .copy { width: min(420px, 46%); }
   .end-copy { width: 80vw; }
-  .end-copy .title { font-size: 24px; } .end-copy .body { font-size: 14px; margin-top: 12px; } .end-copy .btn { margin-top: 18px; }
+  .end-copy .title { font-size: 24px; } .end-copy .body { font-size: 16px; margin-top: 12px; } .end-copy .btn { margin-top: 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
