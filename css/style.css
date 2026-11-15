@@ -355,6 +355,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .map-layer { left: -19%; top: 0; width: 180%; }
   .map-panel { padding: 28px 22px; }
   .biz-services { flex-direction: column; align-items: stretch; gap: 30px; }
+  /* Map text sizes on phones */
+  .map-title { font-size: 48px; }
+  .map-intro .body, .biz p, .biz ul { font-size: 14px; }
+  .biz p.biz-meta { font-size: 12px; }   /* address and opening hours */
+  .biz .title { font-size: 24px; }
+  .biz h3 { font-size: 16px; }
 
   /* About: everything in one column */
   .about-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "text" "img"; padding: 110px var(--gutter) 80px; row-gap: 16px; }
