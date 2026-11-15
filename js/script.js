@@ -241,11 +241,14 @@
   const title = document.querySelector(".home-copy .title");
   if (!mark || !title) return;
   const phone = window.matchMedia("(max-width: 760px)");
+  const body = document.querySelector(".home-copy .body");
   const fit = () => {
-    if (!phone.matches) { mark.style.width = ""; return; }
     const range = document.createRange();
     range.selectNodeContents(title);            // the text itself, not the full-width heading box
-    mark.style.width = `${Math.round(range.getBoundingClientRect().width)}px`;
+    const w = Math.round(range.getBoundingClientRect().width);
+    // The intro text never runs wider than "Uncover the hidden"
+    if (body) body.style.maxWidth = `${w}px`;
+    mark.style.width = phone.matches ? `${w}px` : "";
   };
   fit();
   window.addEventListener("resize", fit);
