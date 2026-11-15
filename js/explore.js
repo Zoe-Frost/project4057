@@ -32,7 +32,7 @@ const SCENES = [
   { id: "mauao",     length: 7.5, fogIn: false, fogOut: false, hold: 0.25,
     seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 171, end: 450, pad: 4, ext: "webp" } },
   // End screen holds on the last frame, darkened behind the text
-  { id: "end",       length: 1.5, fogIn: false, holdPrevious: true },
+  { id: "end",       length: 2.6, fogIn: false, holdPrevious: true },
 ];
 
 const FOG_EDGE = 0.12;   // share of a scene spent fading through fog at each edge
@@ -242,7 +242,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
         if (!copies[s.id]) return false;
         const t = (y - start) / len;
         if (s.id === "intro") return false;   // "Scroll to start" doesn't need to linger
-        if (s.id === "end") return t > 0.15;
+        if (s.id === "end") return t > 0.5;
         return t > 0.16 && t < 0.78;
       }
       start += len;
@@ -307,7 +307,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
       const prev = SCENES[idx - 1].seq;
       // End screen: the last frame, blurred and darkened behind the text.
       // The blur is a CSS filter on the canvas so it also works on iPhones.
-      const k = ramp(t, 0, 0.3);
+      const k = ramp(t, 0.42, 0.62);   // holds the last Mauao frame clear first, then blurs
       endBlur = k;
       drew = drawBlended(prev, prev.end);
       if (drew) {
@@ -339,7 +339,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
       let o = 0;
       if (id === scene.id) {
         if (id === "intro") o = 1 - ramp(t, 0.55, 0.85);
-        else if (id === "end") o = ramp(t, 0.2, 0.4);
+        else if (id === "end") o = ramp(t, 0.55, 0.72);
         else o = ramp(t, 0.18, 0.3) * (1 - ramp(t, 0.62, 0.76));
       }
       el.style.opacity = o.toFixed(3);
