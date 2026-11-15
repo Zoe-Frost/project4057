@@ -10,7 +10,7 @@
   --green: #44D62C;        /* brand green (swap for exact hex) */
   --green-soft: #44D62C;
   --nav-h: clamp(64px, calc(64px + 24 * (100vw - 360px) / 1080), 88px);   /* nav bar height grows with the screen */
-  --gutter: clamp(20px, 5vw, 64px);
+  --gutter: 40px;          /* side margins: 40px on laptops (20px on phones, below) */
   --font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
   --display: "403SuperVega-Regular", "Roboto", sans-serif;   /* header font: fonts/403-super-vega-regular.css */
 
@@ -74,7 +74,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .btn {
   display: inline-block; margin-top: 28px;
-  padding: 6px 36px; border: 1px solid var(--green); border-radius: 999px;   /* fixed size at every screen width */
+  padding: 9px 44px; border: 1.5px solid var(--green); border-radius: 999px; line-height: 1.2;   /* fixed size at every screen width */
   color: var(--green); font-size: 15px; font-weight: 400;
   transition: box-shadow .25s;
 }
@@ -306,12 +306,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-setting .state { color: var(--green); }
 
 @media (max-width: 760px), (max-height: 500px) and (orientation: landscape) {
-  :root { --gutter: 22px; }
+  :root { --gutter: 20px; }
   .only-mobile { display: revert; }
   .only-desktop { display: none !important; }
   .nav { background: linear-gradient(to bottom, rgba(10, 14, 10, .7), rgba(10, 14, 10, 0)); }
   .copy .body { font-size: 16px; }
-  .btn { font-size: 16px; }   /* button text on phones */
+  .btn { font-size: 16px; padding: 10px 46px; }   /* button text on phones */
   .nav-links a, .nav-links .sound-btn { display: none; }
   .menu-btn { display: block; width: clamp(30px, calc(30px + 14 * (100vw - 360px) / 1080), 44px); }
   .menu-btn img { width: 100%; height: auto; }

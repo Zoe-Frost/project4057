@@ -244,6 +244,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
   const MAX_LAG = 0.2;          // how far the page may run ahead of the scene (in scene-lengths)
   let lastUserScroll = 0, setY = -1, ignoreScrollUntil = 0;
   function setScroll(y) {
+    if (!canvas.isConnected) return;
     setY = Math.round(y * vh);
     window.scrollTo(0, setY);
   }
@@ -272,6 +273,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
 
   function render(now = performance.now()) {
     queued = false;
+    if (!canvas.isConnected) return;            // you've moved to another page
     const target = window.scrollY / vh;
     const dt = Math.min(0.1, (now - (lastT || now)) / 1000);
     lastT = now;

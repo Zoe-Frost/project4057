@@ -1,6 +1,27 @@
 /* =========================================================
    4057 — shared behaviour (every page)
    ========================================================= */
+/* ---------- Page changes without reloading ----------
+   Browsers stop a website's sound whenever a new page loads, and iPhones
+   won't start it again until you tap. So links between the 4057 pages swap
+   the page content in place instead of loading a whole new page, and the
+   music keeps playing straight through. (If anything goes wrong it falls
+   back to a normal page load.) */
+let pageAbort = new AbortController();
+// Listeners a page adds to window/document belong to that page, and are
+// removed when you move to another page.
+(() => {
+  const add = EventTarget.prototype.addEventListener;
+  EventTarget.prototype.addEventListener = function (type, fn, opts) {
+    if ((this === window || this === document) && window.__pageSignal && !(opts && typeof opts === "object" && opts.signal)) {
+      opts = (opts && typeof opts === "object") ? Object.assign({}, opts, { signal: window.__pageSignal })
+                                                : { capture: !!opts, signal: window.__pageSignal };
+    }
+    return add.call(this, type, fn, opts);
+  };
+})();
+
+function initPage() {
 (() => {
   // Nav colour: switch to the black logo / dark links when they sit over a white (.light) section
   const nav = document.querySelector(".nav");
@@ -20,16 +41,19 @@
     check();
   }
 })();
+}
 
 (() => {
   /* Sound: the soundtrack loops with no gap and carries on from the same
      point when you change page. The track's last ~2 seconds are its reverb
      tail, so each new pass starts as the music ends (at LOOP_END) and the
      tail rings out underneath it instead of leaving a quiet gap. */
-  const btn = document.querySelector(".sound-btn");
   const el = document.getElementById("ambient");
-  if (!btn || !el) return;
-  const SRC = el.getAttribute("src");
+  if (!el) return;
+  const SRC = el.src;                       // full address, so it works from any page
+  const btns = () => document.querySelectorAll(".sound-btn");
+  const btn = { classList: { add: (k) => btns().forEach((b) => b.classList.add(k)), remove: (k) => btns().forEach((b) => b.classList.remove(k)) },
+                setAttribute: (a, v) => btns().forEach((b) => b.setAttribute(a, v)) };
   const LOOP_START = 0.02, LOOP_END = 15.33, PERIOD = LOOP_END - LOOP_START;
   const POS_KEY = "4057-sound-pos";
 
@@ -171,8 +195,8 @@
     if (on) play(); else stop();
   }
 
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest || !e.target.closest(".sound-btn")) return;
     on = !on;
     try { localStorage.setItem("4057-sound", on ? "on" : "off"); } catch (e2) {}
     if (on) unlockNow();
@@ -180,15 +204,21 @@
   });
 
   window.addEventListener("pagehide", savePos);
+  window.__soundRefresh = () => {           // after a page change: show the right icon, keep playing
+    btn.setAttribute("aria-pressed", String(on));
+    btn.setAttribute("aria-label", on ? "Turn sound off" : "Turn sound on");
+    if (on && (!ctx || ctx.state !== "running")) btn.classList.add("is-waiting");
+  };
   apply();   // on page load: try to carry on (works if the browser allows it)
 })();
 
+function initPage2() {
 (() => {
   // Phone menu: full-screen overlay opened by the menu icon
   const btn = document.querySelector(".menu-btn");
   if (!btn) return;
   const root = document.body.dataset.root || "";
-  const here = location.pathname.split("/").pop() || "index.html";
+  const here = (location.pathname.split("/").pop() || "index").replace(/\.html$/, "");
   const pages = [["Home", "index.html"], ["Explore", "html/explore.html"], ["Map", "html/map.html"], ["About", "html/about.html"]];
   const menu = document.createElement("div");
   menu.className = "menu-overlay";
@@ -202,7 +232,7 @@
     </button>
     <h2 class="menu-title display-font">Menu</h2>
     <nav class="menu-list" aria-label="Main">
-      ${pages.map(([label, href]) => `<a href="${root}${href}"${href.endsWith(here) ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
+      ${pages.map(([label, href]) => `<a href="${root}${href}"${href.replace(/\.html$/, "").endsWith(here) ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
       <details>
         <summary>Settings</summary>
         <button class="menu-setting" type="button" data-setting="sound">Sound <span class="state"></span></button>
@@ -288,4 +318,100 @@
     entries.forEach((e) => { if (e.isIntersecting) { watch.get(e.target).classList.add("is-in"); io.unobserve(e.target); } });
   }, { threshold: 0.2, rootMargin: "0px 0px -12% 0px" });
   watch.forEach((_, t) => io.observe(t));
+})();
+}
+
+window.__pageSignal = pageAbort.signal;   // from here on, listeners belong to this page
+initPage(); initPage2();
+
+(() => {
+  if (!window.fetch || !window.DOMParser || !history.pushState) return;
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  const audio = document.getElementById("ambient");
+  const isPage = (u) => /(^\/$|\/index(\.html)?$|\/html\/(explore|map|about)(\.html)?$)/.test(u.pathname);
+  let shownPath = location.pathname;
+  let busy = false;
+
+  function runScript(old, base) {
+    return new Promise((done) => {
+      const src = old.getAttribute("src");
+      const put = (code, name) => {
+        const s = document.createElement("script");
+        // wrapped in { } so a page's script can run again on a later visit
+        s.textContent = "{\n" + code + "\n}" + (name ? "\n//# sourceURL=" + name : "");
+        document.body.appendChild(s); done();
+      };
+      if (!src) return put(old.textContent);
+      const url = new URL(src, base).href;
+      fetch(url).then((r) => r.text()).then((code) => put(code, url), done);
+    });
+  }
+
+  async function go(href, push, restoreY) {
+    if (busy) return; busy = true;
+    try {
+      const res = await fetch(href, { credentials: "same-origin" });
+      if (!res.ok) throw new Error(res.status);
+      let html = await res.text();
+      html = html.replace(/<head([^>]*)>/i, `<head$1><base href="${new URL(href, location.href).href}">`);
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      if (!doc.querySelector(".nav")) throw new Error("not a 4057 page");
+
+      try { history.replaceState({ y: window.scrollY }, ""); } catch (e) {}
+      if (push) history.pushState({ y: 0 }, "", href);
+      shownPath = location.pathname;
+
+      // the old page's listeners stop here
+      pageAbort.abort(); pageAbort = new AbortController(); window.__pageSignal = pageAbort.signal;
+
+      document.title = doc.title;
+      const d1 = document.querySelector('meta[name="description"]'), d2 = doc.querySelector('meta[name="description"]');
+      if (d1 && d2) d1.setAttribute("content", d2.getAttribute("content"));
+      [...document.body.attributes].forEach((a) => document.body.removeAttribute(a.name));
+      [...doc.body.attributes].forEach((a) => document.body.setAttribute(a.name, a.value));
+
+      const scripts = [...doc.body.querySelectorAll("script")];
+      scripts.forEach((s) => s.remove());
+      doc.body.querySelectorAll("#ambient").forEach((a) => a.remove());
+      window.__pageSignal = null;               // (nothing below belongs to the old page)
+      document.body.replaceChildren(...[...doc.body.childNodes].map((n) => document.adoptNode(n)));
+      if (audio) document.body.appendChild(audio);   // the same music player carries on
+      window.__pageSignal = pageAbort.signal;
+
+      const hash = new URL(href, location.href).hash;
+      const target = hash && document.getElementById(hash.slice(1));
+      window.scrollTo(0, restoreY || 0);
+      if (target) target.scrollIntoView();
+
+      initPage(); initPage2();
+      if (window.__soundRefresh) window.__soundRefresh();
+      for (const s of scripts) {
+        const src = s.getAttribute("src");
+        if (src && /\/js\/script\.js$/.test(new URL(src, href).pathname)) continue;   // already running
+        await runScript(s, href);
+      }
+    } catch (err) {
+      location.href = href;                     // fall back to a normal page load
+    } finally { busy = false; }
+  }
+
+  window.__pageSignal = null;
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest("a[href]");
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (a.target || a.hasAttribute("download")) return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || !isPage(url)) return;
+    if (url.pathname === location.pathname) {
+      if (url.hash) return;                     // a link to another spot on this page
+      e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); return;
+    }
+    e.preventDefault();
+    go(url.href, true);
+  });
+  window.addEventListener("popstate", (e) => {
+    if (location.pathname === shownPath) return;   // only the #part changed
+    go(location.href, false, e.state && e.state.y);
+  });
+  window.__pageSignal = pageAbort.signal;
 })();

@@ -101,7 +101,7 @@
                               : sideways.addListener((e) => { if (e.matches) dismiss(); });
     setTimeout(dismiss, 5000);
     // After 10 seconds, fade out the "Scroll to start" prompt
-    setTimeout(() => document.querySelector(".copy.intro").classList.add("is-timed-out"), 10000);
+    setTimeout(() => { const i = document.querySelector(".copy.intro"); if (i) i.classList.add("is-timed-out"); }, 10000);
   </script>
 </body>
 </html>
