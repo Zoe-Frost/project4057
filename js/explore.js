@@ -15,7 +15,7 @@ const SCENES = [
   { id: "intro",     length: 1.2, fogOut: false },
   // Camera tilts down from Mauao into the dark water (1–95), then black (95–110)
   { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18,
-    seq: { dir: "../frames/welcome/", prefix: "frame_", start: 1, end: 110, pad: 4, ext: "webp" } },
+    seq: { dir: "../frames/welcome/", prefix: "frame_", start: 1, end: 165, pad: 4, ext: "webp" } },
   // Room render v2 (701 frames): black 0–50, drawer 60–200, dive into the wires 220–290,
   // pan across to the table 300–460, the pie 480–620, then fades to dark 640–700
   { id: "drawer",    length: 5,   fogIn: false, fogOut: false, hold: 0.43,
