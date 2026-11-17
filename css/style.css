@@ -381,7 +381,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   /* About: everything in one column */
   .about-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "text" "img"; padding: 110px var(--gutter) 80px; row-gap: 16px; }
   .about-row .about-img { margin-top: 30px; }
-  .story-photo { width: 100%; aspect-ratio: 16 / 11; }
+  .story-photo { width: 100%; aspect-ratio: 9 / 4; }   /* a little shorter so the whole Our story section fits on one phone screen */
   .mission-art { aspect-ratio: 16 / 8; }
   .values { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "intro" "list"; row-gap: 14px; padding: 130px var(--gutter) 130px; }
   .values-intro { max-width: none; }
@@ -390,7 +390,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .contact-form .row { gap: 20px; }
   .contact-form input, .contact-form textarea { border-radius: 10px; padding: 10px 12px; font-size: 16px; }   /* 16px stops iPhones zooming in on tap */
   .contact-form textarea { min-height: 112px; }
-  .faqs { padding: 110px var(--gutter) 190px; }
+  .faqs { padding: 110px var(--gutter) 280px; }
   .faq-list .faq-small { order: -1; }          /* phone order: "Can I get my business..." second */
   .faq-list details:first-of-type { order: -2; }
   .footer { padding: 0 var(--gutter) calc(100px + env(safe-area-inset-bottom)); }   /* room so Safari's bottom bar never covers it */
@@ -439,8 +439,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 html:has(.about-page) { scroll-snap-type: y proximity; scroll-padding-top: var(--nav-h); }
 .about-page > section { scroll-snap-align: start; }
 html:has(.about-page) .footer { scroll-snap-align: end; }
-@media (min-width: 761px) { .about-row.story { scroll-snap-align: center; } }   /* Our story settles in the middle of the screen */
-@media (max-width: 760px) { .about-row.story { scroll-margin-top: -60px; } }   /* phones: Our story settles higher up, closer to the nav */
+/* The opening and Our story are handled by js/script.js: one scroll down from
+   the opening glides straight to the whole Our story section. */
+.about-page > .about-hero, .about-page > .about-row.story { scroll-snap-align: none; }
 @media (prefers-reduced-motion: reduce) {   /* "Reduce Motion" on: still fades in, just without sliding or zooming */
   .reveal, .reveal.about-img, .reveal.from-top:not(.is-in):not(.about-img),
   .values-list li.reveal, .faq-list details.reveal { transform: none !important; filter: none !important; clip-path: none !important; }
