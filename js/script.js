@@ -348,8 +348,8 @@ function initPage2() {
       <rect x="6" y="48" width="92" height="46" rx="5" fill="none" stroke="#44D62C" stroke-width="2.5"/>
       <rect x="66" y="4" width="46" height="88" rx="5" fill="#2fbf26"/>
       <circle cx="89" cy="82" r="3.5" fill="#111"/>
-      <path d="M50 38c-14 0-24-9-26-24" fill="none" stroke="#44D62C" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M18 19l6-6 6 7" fill="none" stroke="#44D62C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 40c0-15 10-25 27-26" fill="none" stroke="#44D62C" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M35 8l6 6-6 6" fill="none" stroke="#44D62C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <p>Turn your phone back upright to explore the map</p>`;
   document.body.appendChild(note);

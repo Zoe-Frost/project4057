@@ -276,10 +276,11 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
     return true;
   }
   let stallSince = 0;
-  const TRAIL = 0.12;           // how far the scene glides on after you stop scrolling (in scene lengths)
+  const TRAIL = PHONE ? 0.35 : 0.12;   // how far the scene glides on after you stop scrolling (in scene lengths); phones glide for longer
+  const EASE = PHONE ? 0.3 : 0.15;     // how gradually it slows down at the end of a glide
   const PHONE_PACE = 1.45;      // phones play a little quicker
   let trailing = false;
-  const MAX_LAG = 0.2;          // how far the page may run ahead of the scene (in scene-lengths)
+  const MAX_LAG = PHONE ? 0.45 : 0.2;   // (must be more than TRAIL so there's something left to glide)          // how far the page may run ahead of the scene (in scene-lengths)
   let lastUserScroll = 0, setY = -1, ignoreScrollUntil = 0;
   function setScroll(y) {
     if (!canvas.isConnected) return;
@@ -331,7 +332,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       const gap = target - current;
       let step = Math.sign(gap) * pace * dt;
       // ease in to a gentle stop over the last little bit
-      if (Math.abs(gap) < 0.15) step *= Math.max(0.25, Math.abs(gap) / 0.15);
+      if (Math.abs(gap) < EASE) step *= Math.max(0.2, Math.abs(gap) / EASE);
       let next = Math.abs(step) >= Math.abs(gap) ? target : current + step;
       // If the next frame hasn't downloaded yet, pause briefly and wait for it
       // rather than jumping ahead to whatever frame is ready.
