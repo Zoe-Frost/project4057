@@ -393,7 +393,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .faqs { padding: 110px var(--gutter) 280px; }
   .faq-list .faq-small { order: -1; }          /* phone order: "Can I get my business..." second */
   .faq-list details:first-of-type { order: -2; }
-  .footer { padding: 0 var(--gutter) calc(100px + env(safe-area-inset-bottom)); }   /* room so Safari's bottom bar never covers it */
+  .footer { padding: 0 var(--gutter) calc(36px + env(safe-area-inset-bottom)); }   /* a little room under the copyright line */
   .footer-cols .footer-logo img { width: 130px; }
   .copyright { margin-top: 28px; }
 }
