@@ -22,15 +22,15 @@ const SCENES = [
     seq: { dir: "../frames/room/", prefix: "frame_", start: 0,   end: 300, pad: 4, ext: "webp" } },
   { id: "pie",       length: 6,   fogIn: false, fogOut: "black", hold: 0.67,
     seq: { dir: "../frames/room/", prefix: "frame_", start: 301, end: 700, pad: 4, ext: "webp" } },
-  // Boardwalk flows straight into the final render (its frame 1 = boardwalk frame 120)
+  // Boardwalk (300 frames) flows straight into the final render (its frame 1 = boardwalk frame 300)
   { id: "boardwalk", length: 3.5, fogIn: "black", fogOut: false,
-    seq: { dir: "../frames/boardwalk/", prefix: "frame_", start: 1, end: 120, pad: 4, ext: "webp" } },
-  // Final render, 450 frames: e-waste fields (text ~frame 120), up Mauao (text ~frame 240),
-  // over the top, dive into the ocean (~400) and rise to the final view of the Mount (450)
+    seq: { dir: "../frames/boardwalk/", prefix: "frame_", start: 1, end: 300, pad: 4, ext: "webp" } },
+  // Final render, 1100 frames: e-waste fields (text ~frame 290), up Mauao (text ~frame 585),
+  // over the top, dive into the ocean (~915-975) and rise to the final view of the Mount (~1087, then a short hold)
   { id: "pilotbay",  length: 4.5, fogIn: false, fogOut: false, hold: 0.7,
-    seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 1,   end: 170, pad: 4, ext: "webp" } },
+    seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 1,   end: 414, pad: 4, ext: "webp" } },
   { id: "mauao",     length: 10, fogIn: false, fogOut: false, hold: 0.25,
-    seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 171, end: 450, pad: 4, ext: "webp" } },
+    seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 415, end: 1100, pad: 4, ext: "webp" } },
   // End screen holds on the last frame, darkened behind the text
   { id: "end",       length: 2.6, fogIn: false, holdPrevious: true },
 ];
