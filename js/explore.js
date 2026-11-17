@@ -11,13 +11,14 @@
      fogIn / fogOut : false = no fog at that edge (for continuous shots), "black" = fade through black
      hold   : roughly where in the frames the text belongs (0–1, default 0.5)
      text   : optional [from, to] share of the scene the text stays up for (overrides hold)
+     pauseBefore : scrolling (in scene lengths) spent on the first frame before the camera moves
      Every scene plays at the same steady speed: its length is set from its
      number of frames (FRAMES_PER_UNIT below), so more frames = longer scene.
    ========================================================= */
 const SCENES = [
   { id: "intro",     length: 1.2, fogOut: false },
   // Camera tilts down from Mauao into the dark water (1–95), then black (95–110)
-  { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18, text: [0.06, 0.8],
+  { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18, pauseBefore: 1, text: [0.04, 0.8],   // "Welcome" comes up before the camera starts moving
     seq: { dir: "../frames/welcome/", prefix: "frame_", start: 1, end: 165, pad: 4, ext: "webp" } },
   // Room render v2 (701 frames): black 0–50, drawer 60–200, dive into the wires 220–290,
   // pan across to the table 300–460, the pie 480–620, then fades to dark 640–700
@@ -63,10 +64,10 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   const SMALL_SCREEN = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
   const END = SMALL_SCREEN
     ? { length: 0.8, blur: [0.08, 0.3],  text: [0.22, 0.42], slow: 0.2 }
-    : { length: 2.6, blur: [0.42, 0.62], text: [0.55, 0.72], slow: 0.5 };
+    : { length: 1.6, blur: [0.12, 0.38], text: [0.28, 0.48], slow: 0.3 };
   SCENES.find((s) => s.id === "end").length = END.length;
   // Steady speed: each scene's scroll length comes from its number of frames.
-  SCENES.forEach((s) => { if (s.seq) s.length = (s.seq.end - s.seq.start + 1) / FRAMES_PER_UNIT; });
+  SCENES.forEach((s) => { if (s.seq) s.length = (s.seq.end - s.seq.start + 1) / FRAMES_PER_UNIT + (s.pauseBefore || 0); });
 
   const total = SCENES.reduce((s, sc) => s + sc.length, 0);
   let vh = window.innerHeight;
@@ -186,7 +187,11 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const ramp = (t, a, b) => clamp((t - a) / (b - a));
   // Frames are spread evenly through each scene, so the camera moves at a steady speed.
-  function holdEase(t) { return t; }
+  // (pauseBefore keeps the first frame on screen for a moment first.)
+  function holdEase(t, s) {
+    const p = s && s.pauseBefore ? s.pauseBefore / s.length : 0;
+    return t <= p ? 0 : (t - p) / (1 - p);
+  }
   // The part of a scene (0–1) its text is on screen for.
   function textRange(s) {
     if (s.text) return s.text;
@@ -241,7 +246,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       if (y < start + s.length || i === SCENES.length - 1) {
         const t = clamp((y - start) / s.length);
         let seq = null, n = 0;
-        if (s.seq) { seq = s.seq; n = Math.round(seq.start + holdEase(t, s.hold) * (seq.end - seq.start)); }
+        if (s.seq) { seq = s.seq; n = Math.round(seq.start + holdEase(t, s) * (seq.end - seq.start)); }
         else if (s.id === "intro" && SCENES[1].seq) { seq = SCENES[1].seq; n = seq.start; }
         else if (s.holdPrevious && SCENES[i - 1] && SCENES[i - 1].seq) { seq = SCENES[i - 1].seq; n = seq.end; }
         if (!seq) return true;
@@ -325,7 +330,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       start += SCENES[i].length;
     }
     const scene = SCENES[idx];
-    plan(idx, scene.seq ? scene.seq.start + holdEase(t, scene.hold) * (scene.seq.end - scene.seq.start) : 0);
+    plan(idx, scene.seq ? scene.seq.start + holdEase(t, scene) * (scene.seq.end - scene.seq.start) : 0);
 
     // background
     let endBlur = 0;
@@ -334,7 +339,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       const e = load(scene.still);
       if (e.ok) { drawCover(e.img, 1 + 0.08 * t); drew = true; }
     } else if (scene.seq) {
-      drew = drawBlended(scene.seq, scene.seq.start + holdEase(t, scene.hold) * (scene.seq.end - scene.seq.start));
+      drew = drawBlended(scene.seq, scene.seq.start + holdEase(t, scene) * (scene.seq.end - scene.seq.start));
     } else if (scene.id === "intro" && SCENES[1].seq) {
       drew = drawBlended(SCENES[1].seq, SCENES[1].seq.start);   // show the first welcome frame behind "Scroll to start"
     } else if (scene.holdPrevious && SCENES[idx - 1] && SCENES[idx - 1].seq) {

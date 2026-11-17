@@ -62,7 +62,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-links a { font-size: var(--fs-nav); font-weight: 400; opacity: .9; transition: color .2s, opacity .2s; }
 .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--green); opacity: 1; }
 .sound-btn { width: clamp(26px, calc(26px + 8 * (100vw - 360px) / 1080), 34px); height: clamp(26px, calc(26px + 8 * (100vw - 360px) / 1080), 34px); display: grid; place-items: center; color: var(--green); }
-.sound-btn img { width: 88%; height: auto; }
+.sound-btn { justify-items: start; }
+.sound-btn img { height: 76%; width: auto; }   /* both icons at the same height, so the speaker is the same size and doesn't move when toggled */
 .sound-btn.is-waiting { animation: sound-pulse 1.6s ease-in-out infinite; }   /* sound is on but waiting for a tap/click */
 @keyframes sound-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 .sound-btn .snd-on, .sound-btn[aria-pressed="false"] .snd-off { display: block; }
