@@ -21,7 +21,7 @@
 const SCENES = [
   { id: "intro",     length: 0.4, fogOut: false },   // short: "Welcome" comes up soon after you start scrolling
   // Camera tilts down from Mauao into the dark water (1–95), then black (95–110)
-  { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18, pauseBefore: 1, text: [0.0, 0.8],   // "Welcome" comes up before the camera starts moving
+  { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18, pauseBefore: 0.6, text: [0.0, 0.8],   // "Welcome" comes up before the camera starts moving
     seq: { dir: "../frames/welcome/", prefix: "frame_", start: 1, end: 165, pad: 4, ext: "webp" } },
   // Room render v2 (701 frames): black 0–50, drawer 60–200, dive into the wires 220–290,
   // pan across to the table 300–460, the pie 480–620, then fades to dark 640–700
@@ -30,8 +30,8 @@ const SCENES = [
   { id: "pie",       length: 6,   fogIn: false, fogOut: "black", hold: 0.67,
     seq: { dir: "../frames/room/", prefix: "frame_", start: 301, end: 700, pad: 4, ext: "webp" } },
   // Boardwalk (300 frames) flows straight into the final render (its frame 1 = boardwalk frame 300)
-  { id: "boardwalk", length: 3.5, fogIn: "black", fogOut: false, speed: 1.35, fastStart: [45, 3], fastEnd: [60, 2.5],   // walks a bit quicker; the slow start and the tilt at the end go by quicker
-    seq: { dir: "../frames/boardwalk/", prefix: "frame_", start: 1, end: 300, pad: 4, ext: "webp" } },
+  { id: "boardwalk", length: 3.5, fogIn: "black", fogOut: false, speed: 1.35, fastStart: [45, 3], fastEnd: [50, 3],   // walks a bit quicker; the slow start and the tilt at the end go by quicker
+    seq: { dir: "../frames/boardwalk/", prefix: "frame_", start: 1, end: 290, pad: 4, ext: "webp" } },   // the last few frames barely move, so it hands over to Pilot Bay at 290
   // Final render, 1100 frames: e-waste fields (text ~frame 290), up Mauao (text ~frame 585),
   // over the top, dive into the ocean (~915-975) and rise to the final view of the Mount (~1087, then a short hold)
   { id: "pilotbay",  length: 4.5, fogIn: false, fogOut: false, hold: 0.7,
