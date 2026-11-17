@@ -277,7 +277,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   }
   let stallSince = 0;
   const TRAIL = 0.12;           // how far the scene glides on after you stop scrolling (in scene lengths)
-  const PHONE_PACE = 1.3;       // phones play a little quicker
+  const PHONE_PACE = 1.45;      // phones play a little quicker
   let trailing = false;
   const MAX_LAG = 0.2;          // how far the page may run ahead of the scene (in scene-lengths)
   let lastUserScroll = 0, setY = -1, ignoreScrollUntil = 0;
