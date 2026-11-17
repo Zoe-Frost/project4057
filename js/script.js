@@ -285,8 +285,9 @@ function initPage2() {
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 })();
 
-// Behind the scenes: each heading, paragraph and image fades and slides up
-// the first time it scrolls into view (items in the same section follow one after another).
+// Behind the scenes: each heading, paragraph and image fades and slides in
+// whenever it scrolls into view, scrolling down or back up (items in the same
+// section follow one after another). Works the same on phones and laptops.
 (() => {
   const page = document.querySelector(".about-page");
   if (!page || !("IntersectionObserver" in window)) return;
@@ -315,8 +316,17 @@ function initPage2() {
     watch.set(target, el);
   });
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => { if (e.isIntersecting) { watch.get(e.target).classList.add("is-in"); io.unobserve(e.target); } });
-  }, { threshold: 0.2, rootMargin: "0px 0px -12% 0px" });
+    entries.forEach((e) => {
+      const el = watch.get(e.target);
+      if (e.isIntersecting && e.intersectionRatio >= 0.15) el.classList.add("is-in");
+      else if (!e.isIntersecting) {
+        // Gone off screen: hide it again so it animates next time, coming in
+        // from above if it left over the top (i.e. when scrolling back up).
+        el.classList.remove("is-in");
+        el.classList.toggle("from-top", e.boundingClientRect.top < (e.rootBounds ? e.rootBounds.top : 0));
+      }
+    });
+  }, { threshold: [0, 0.15], rootMargin: "0px 0px -8% 0px" });
   watch.forEach((_, t) => io.observe(t));
 })();
 }

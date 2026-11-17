@@ -419,6 +419,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .reveal.about-img.is-in { transform: none; clip-path: inset(0 0 0 0 round 14px); }
 .values-list li.reveal, .faq-list details.reveal { transform: translateX(-40px); }
 .values-list li.reveal.is-in, .faq-list details.reveal.is-in { transform: none; }
+.reveal.from-top:not(.is-in):not(.about-img) { transform: translateY(-56px); }   /* scrolling back up: comes down into place */
+
+/* Behind the scenes: the page gently settles on each section when you stop
+   scrolling, so it's harder to fly past something by accident. */
+html:has(.about-page) { scroll-snap-type: y proximity; scroll-padding-top: var(--nav-h); }
+.about-page > section { scroll-snap-align: start; }
+html:has(.about-page) .footer { scroll-snap-align: end; }
 @media (prefers-reduced-motion: reduce) { .reveal, .reveal.about-img { opacity: 1; transform: none; filter: none; clip-path: none; transition: none; } }
 
 /* No outline box after tapping or clicking (keyboard users still get one) */
