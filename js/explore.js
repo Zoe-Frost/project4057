@@ -27,7 +27,7 @@ const SCENES = [
   // pan across to the table 300–460, the pie 480–620, then fades to dark 640–700
   { id: "drawer",    length: 5,   fogIn: false, fogOut: false, hold: 0.43,
     seq: { dir: "../frames/room/", prefix: "frame_", start: 0,   end: 300, pad: 4, ext: "webp" } },
-  { id: "pie",       length: 6,   fogIn: false, fogOut: "black", hold: 0.67,
+  { id: "pie",       length: 6,   fogIn: false, fogOut: "black", hold: 0.67, fastEnd: [50, 3],   // the fade to dark at the end goes by quicker
     seq: { dir: "../frames/room/", prefix: "frame_", start: 301, end: 700, pad: 4, ext: "webp" } },
   // Boardwalk (300 frames) flows straight into the final render (its frame 1 = boardwalk frame 300)
   { id: "boardwalk", length: 3.5, fogIn: "black", fogOut: false, speed: 1.35, fastStart: [45, 3], fastEnd: [50, 3],   // walks a bit quicker; the slow start and the tilt at the end go by quicker
@@ -121,7 +121,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   const PHONE = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
   const KEEP = PHONE ? 75 : Infinity;       // phones only hold the frames around where you are
   const PHONE_SLOW = 3;                     // phones: scenes take 3x more scrolling (raise to slow down more)
-  const MAX_ACTIVE = 6;
+  const MAX_ACTIVE = PHONE ? 6 : 10;
   const cache = new Map(); // url -> { img, ok, done, started }
   let active = 0, wanted = [], lastPlan = "";
   function entryFor(url) {
@@ -162,7 +162,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   // Re-order the download queue around the current scene and frame.
   // The frames just ahead come first, and that run carries on into the next
   // scene so scene changes are ready before you reach them.
-  const AHEAD = PHONE ? 60 : 90, BEHIND = PHONE ? 15 : 20;
+  const AHEAD = PHONE ? 60 : 240, BEHIND = PHONE ? 15 : 20;   // computers load about 10 seconds ahead
   function plan(idx, frame) {
     const key = idx + ":" + Math.round(frame / 4);
     if (key === lastPlan) return;
@@ -330,7 +330,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       // rather than jumping ahead to whatever frame is ready.
       if (!frameReady(next)) {
         if (!stallSince) stallSince = now;
-        if (now - stallSince < 1500) next = current;
+        if (now - stallSince < 700) next = current;   // wait a moment at most, then carry on
       } else stallSince = 0;
       current = next;
       // Speed limit: scrolling faster than the scene moves doesn't build up
