@@ -192,8 +192,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   transition: opacity .25s ease, transform .3s ease, filter .25s ease; }
 .map-panel.is-in .biz-block, .map-panel.is-in .biz-close { opacity: 1; transform: none; filter: none;
   transition: opacity .8s ease, transform .9s cubic-bezier(.16,.84,.3,1), filter .8s ease; transition-delay: var(--d, 0s); }
-@media (prefers-reduced-motion: reduce) {
-  .map-art, .map-panel, .map-panel .biz-block, .map-panel .biz-close { transition: none !important; transform: none !important; filter: none !important; }
+@media (prefers-reduced-motion: reduce) {   /* "Reduce Motion" on: things still fade in and out, just without moving */
+  .map-art, .map-panel, .map-panel .biz-block, .map-panel .biz-close { transform: none !important; filter: none !important; }
 }
 .biz { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: clamp(18px, 2.4vh, 30px); }
 /* The card is at least as tall as the map box and grows to fit, so it never scrolls; extra room is shared between its three parts */
@@ -393,9 +393,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .faqs { padding: 110px var(--gutter) 130px; }
   .faq-list .faq-small { order: -1; }          /* phone order: "Can I get my business..." second */
   .faq-list details:first-of-type { order: -2; }
-  .footer { padding: 0 var(--gutter) 40px; }
+  .footer { padding: 0 var(--gutter) calc(100px + env(safe-area-inset-bottom)); }   /* room so Safari's bottom bar never covers it */
   .footer-cols .footer-logo img { width: 130px; }
-  .copyright { margin-top: -22px; }
+  .copyright { margin-top: 28px; }
 }
 
 /* Phones turned sideways: Explore */
@@ -439,7 +439,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 html:has(.about-page) { scroll-snap-type: y proximity; scroll-padding-top: var(--nav-h); }
 .about-page > section { scroll-snap-align: start; }
 html:has(.about-page) .footer { scroll-snap-align: end; }
-@media (prefers-reduced-motion: reduce) { .reveal, .reveal.about-img { opacity: 1; transform: none; filter: none; clip-path: none; transition: none; } }
+@media (prefers-reduced-motion: reduce) {   /* "Reduce Motion" on: still fades in, just without sliding or zooming */
+  .reveal, .reveal.about-img, .reveal.from-top:not(.is-in):not(.about-img),
+  .values-list li.reveal, .faq-list details.reveal { transform: none !important; filter: none !important; clip-path: none !important; }
+}
 
 /* No outline box after tapping or clicking (keyboard users still get one) */
 .menu-btn:focus:not(:focus-visible), .menu-close:focus:not(:focus-visible), .sound-btn:focus:not(:focus-visible),

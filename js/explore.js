@@ -121,7 +121,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   const PHONE = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
   const KEEP = PHONE ? 75 : Infinity;       // phones only hold the frames around where you are
   const PHONE_SLOW = 3;                     // phones: scenes take 3x more scrolling (raise to slow down more)
-  const MAX_ACTIVE = PHONE ? 6 : 10;
+  const MAX_ACTIVE = PHONE ? 10 : 10;   // download several frames at once so phones keep up
   const cache = new Map(); // url -> { img, ok, done, started }
   let active = 0, wanted = [], lastPlan = "";
   function entryFor(url) {
@@ -276,6 +276,9 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
     return true;
   }
   let stallSince = 0;
+  const TRAIL = 0.12;           // how far the scene glides on after you stop scrolling (in scene lengths)
+  const PHONE_PACE = 1.3;       // phones play a little quicker
+  let trailing = false;
   const MAX_LAG = 0.2;          // how far the page may run ahead of the scene (in scene-lengths)
   let lastUserScroll = 0, setY = -1, ignoreScrollUntil = 0;
   function setScroll(y) {
@@ -309,18 +312,22 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   function render(now = performance.now()) {
     queued = false;
     if (!canvas.isConnected) return;            // you've moved to another page
-    const target = window.scrollY / vh;
+    let target = window.scrollY / vh;
     const dt = Math.min(0.1, (now - (lastT || now)) / 1000);
     lastT = now;
     const idle = now - lastUserScroll > 160;      // the person has stopped scrolling
-    if (current === null || reduceMotion) current = target;
-    else if (idle && Math.abs(target - current) > 0.04) {
-      // Stopped scrolling: the scene stops too (no auto-playing to catch up),
-      // and the page is lined back up with where the scene actually is.
-      setScroll(current);
+    if (!idle) trailing = false;
+    if (current === null) current = target;   // (the steady pace applies with Reduce Motion on too; it keeps playback smooth)
+    else if (idle && !trailing && Math.abs(target - current) > TRAIL) {
+      // Stopped scrolling: the scene glides on a little and eases to a stop
+      // (no auto-playing to catch up), and the page is lined up with that spot.
+      target = current + Math.sign(target - current) * TRAIL;
+      setScroll(target);
+      trailing = true;
       stallSince = 0;
-    } else if (current !== target) {
-      const pace = textOnScreenAt(current) ? TEXT_PACE : PACE;
+    }
+    if (current !== null && current !== target) {
+      const pace = (textOnScreenAt(current) ? TEXT_PACE : PACE) * (PHONE ? PHONE_PACE : 1);
       const gap = target - current;
       let step = Math.sign(gap) * pace * dt;
       // ease in to a gentle stop over the last little bit
@@ -337,7 +344,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       // a backlog; the page is held just ahead of the scene.
       if (Math.abs(target - current) > MAX_LAG) setScroll(current + Math.sign(target - current) * MAX_LAG);
     }
-    if (current !== target && !(idle && Math.abs(target - current) > 0.04)) requestRender();   // keep gliding until we arrive
+    if (current !== target) requestRender();   // keep gliding until we arrive
     else lastT = 0;
     const y = current;                             // scroll position in screen heights
     let start = 0, idx = SCENES.length - 1, t = 1;
