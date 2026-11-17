@@ -57,8 +57,9 @@ function initPage() {
   const LOOP_START = 0.02, LOOP_END = 15.33, PERIOD = LOOP_END - LOOP_START;
   const POS_KEY = "4057-sound-pos";
 
-  let on = false;
-  try { on = localStorage.getItem("4057-sound") === "on"; } catch (e) {}
+  // Sound starts ON every time the site is opened. Turning it off only lasts
+  // while you're moving around the site; reopening the site resets it to on.
+  let on = true;
 
   let ctx = null, gain = null, buffer = null, loading = null;
   let origin = 0, nextAt = 0, timer = null, sources = [];
@@ -198,7 +199,6 @@ function initPage() {
   document.addEventListener("click", (e) => {
     if (!e.target.closest || !e.target.closest(".sound-btn")) return;
     on = !on;
-    try { localStorage.setItem("4057-sound", on ? "on" : "off"); } catch (e2) {}
     if (on) unlockNow();
     apply();
   });
