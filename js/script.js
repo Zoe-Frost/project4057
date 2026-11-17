@@ -329,42 +329,6 @@ function initPage2() {
   }, { threshold: [0, 0.15], rootMargin: "0px 0px -8% 0px" });
   watch.forEach((_, t) => io.observe(t));
 })();
-
-// Behind the scenes: one scroll down from the opening goes straight to the
-// whole Our story section (instead of stopping part-way and needing another).
-(() => {
-  const hero = document.querySelector(".about-hero"), story = document.querySelector(".about-row.story");
-  if (!hero || !story) return;
-  const navH = () => (document.querySelector(".nav") || {}).offsetHeight || 0;
-  // where Our story is fully in view: centred under the nav, but never with its heading hidden
-  // (page positions measured without the reveal animations' movement)
-  const pageTop = (el) => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
-  const target = () => {
-    const top = pageTop(story);
-    const title = pageTop(story.querySelector(".title"));
-    const last = story.querySelector(".story-photo") || story;
-    const bottom = pageTop(last) + last.offsetHeight;
-    const centred = (title + bottom) / 2 - (window.innerHeight + navH()) / 2;
-    return Math.round(Math.max(top - navH(), Math.min(centred, title - navH() - 16)));
-  };
-  let lastY = window.scrollY, dir = 0, timer = 0, gliding = false;
-  window.addEventListener("scroll", () => {
-    const y = window.scrollY;
-    if (y !== lastY) dir = y > lastY ? 1 : -1;
-    lastY = y;
-    if (gliding) return;
-    clearTimeout(timer);
-    timer = setTimeout(() => {               // you've stopped scrolling
-      const t = target(), y2 = window.scrollY;
-      if (dir > 0 && y2 > 4 && y2 < t - 4) {  // stopped between the opening and Our story
-        gliding = true;
-        window.scrollTo({ top: t, behavior: "smooth" });
-        setTimeout(() => { gliding = false; }, 900);
-      }
-    }, 120);
-  }, { passive: true });
-})();
-
 // Phones: after the experience (watched sideways), the map briefly asks to
 // turn the phone back upright. It goes as soon as the phone is turned, or
 // after 5 seconds, or when tapped.

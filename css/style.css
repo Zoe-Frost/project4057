@@ -427,14 +427,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .reveal.is-in { opacity: 1; transform: none; }
 .reveal.from-top:not(.is-in) { transform: translate3d(0, -24px, 0); }   /* scrolling back up: comes down into place */
 
-/* Behind the scenes: the page gently settles on each section when you stop
-   scrolling, so it's harder to fly past something by accident. */
-html:has(.about-page) { scroll-snap-type: y proximity; scroll-padding-top: var(--nav-h); }
-.about-page > section { scroll-snap-align: start; }
-html:has(.about-page) .footer { scroll-snap-align: end; }
-/* The opening and Our story are handled by js/script.js: one scroll down from
-   the opening glides straight to the whole Our story section. */
-.about-page > .about-hero, .about-page > .about-row.story { scroll-snap-align: none; }
 @media (prefers-reduced-motion: reduce) {   /* "Reduce Motion" on: still fades in, just without sliding or zooming */
   .reveal, .reveal.about-img, .reveal.from-top:not(.is-in):not(.about-img),
   .values-list li.reveal, .faq-list details.reveal { transform: none !important; filter: none !important; clip-path: none !important; }
