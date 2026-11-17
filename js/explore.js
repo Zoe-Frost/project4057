@@ -9,12 +9,15 @@
      still  : a single image (slow zoom) instead of frames
      seq    : an image sequence, e.g. frames/boardwalk/frame_0001.png
      fogIn / fogOut : false = no fog at that edge (for continuous shots), "black" = fade through black
-     hold   : where in the frames the camera slows for the text (0–1, default 0.42)
+     hold   : roughly where in the frames the text belongs (0–1, default 0.5)
+     text   : optional [from, to] share of the scene the text stays up for (overrides hold)
+     Every scene plays at the same steady speed: its length is set from its
+     number of frames (FRAMES_PER_UNIT below), so more frames = longer scene.
    ========================================================= */
 const SCENES = [
   { id: "intro",     length: 1.2, fogOut: false },
   // Camera tilts down from Mauao into the dark water (1–95), then black (95–110)
-  { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18,
+  { id: "welcome",   length: 3,   fogIn: false, fogOut: false, hold: 0.18, text: [0.06, 0.8],
     seq: { dir: "../frames/welcome/", prefix: "frame_", start: 1, end: 165, pad: 4, ext: "webp" } },
   // Room render v2 (701 frames): black 0–50, drawer 60–200, dive into the wires 220–290,
   // pan across to the table 300–460, the pie 480–620, then fades to dark 640–700
@@ -29,7 +32,7 @@ const SCENES = [
   // over the top, dive into the ocean (~915-975) and rise to the final view of the Mount (~1087, then a short hold)
   { id: "pilotbay",  length: 4.5, fogIn: false, fogOut: false, hold: 0.7,
     seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 1,   end: 414, pad: 4, ext: "webp" } },
-  { id: "mauao",     length: 10, fogIn: false, fogOut: false, hold: 0.25,
+  { id: "mauao",     length: 10, fogIn: false, fogOut: false, hold: 0.25, text: [0.06, 0.62],   // text gone before the dive
     seq: { dir: "../frames/mtpilot/", prefix: "frame_", start: 415, end: 1100, pad: 4, ext: "webp" } },
   // End screen holds on the last frame, darkened behind the text
   { id: "end",       length: 2.6, fogIn: false, holdPrevious: true },
@@ -38,11 +41,14 @@ const SCENES = [
 const FOG_EDGE = 0.12;   // share of a scene spent fading through fog at each edge
 const BLEND = false;     // true = cross-fade between frames (smoother on slow moves, but smears fast ones)
 
-// Playback pace: the scenes play at a steady speed however fast someone scrolls.
-// Scrolling only says where to go; the scenes travel there at these speeds
-// (in scene lengths per second), and much slower while text is on screen.
-const PACE = 0.6;        // normal speed (raise = faster)
-const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
+// Playback pace: every scene plays at one steady speed, however fast someone
+// scrolls. Scrolling only says where to go; the scenes travel there at PACE
+// (scene lengths per second). With 60 frames per scene length and PACE 0.4,
+// the renders play at 24 frames a second, the speed they were rendered at.
+const FRAMES_PER_UNIT = 60;
+const PACE = 0.4;          // raise = faster everywhere
+const TEXT_PACE = PACE;    // same speed while text is up (steady throughout)
+const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its hold point to 60% after (most of the scene)
 
 (() => {
   const wrap = document.getElementById("experience");
@@ -59,6 +65,8 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
     ? { length: 0.8, blur: [0.08, 0.3],  text: [0.22, 0.42], slow: 0.2 }
     : { length: 2.6, blur: [0.42, 0.62], text: [0.55, 0.72], slow: 0.5 };
   SCENES.find((s) => s.id === "end").length = END.length;
+  // Steady speed: each scene's scroll length comes from its number of frames.
+  SCENES.forEach((s) => { if (s.seq) s.length = (s.seq.end - s.seq.start + 1) / FRAMES_PER_UNIT; });
 
   const total = SCENES.reduce((s, sc) => s + sc.length, 0);
   let vh = window.innerHeight;
@@ -177,12 +185,16 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
   /* ---------- timing helpers ---------- */
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const ramp = (t, a, b) => clamp((t - a) / (b - a));
-  // Camera slows down while the text is on screen so people can read it.
-  function holdEase(t, h = 0.425) {
-    const a = h - 0.1, b = h + 0.1;              // frame window shown while text is up (wider = gentler slow-down)
-    if (t < 0.25) return (t / 0.25) * a;
-    if (t < 0.65) return a + ((t - 0.25) / 0.4) * (b - a);
-    return b + ((t - 0.65) / 0.35) * (1 - b);
+  // Frames are spread evenly through each scene, so the camera moves at a steady speed.
+  function holdEase(t) { return t; }
+  // The part of a scene (0–1) its text is on screen for.
+  function textRange(s) {
+    if (s.text) return s.text;
+    const h = s.hold == null ? 0.5 : s.hold;
+    let a = Math.max(0.06, h - TEXT_SPAN[0]), b = Math.min(0.94, h + TEXT_SPAN[1]);
+    if (s.fogIn) a = Math.max(a, FOG_EDGE + 0.02);
+    if (s.fogOut) b = Math.min(b, 1 - FOG_EDGE - 0.02);
+    return [a, b];
   }
 
   /* ---------- drawing ---------- */
@@ -362,7 +374,7 @@ const TEXT_PACE = 0.18;  // speed while text is showing (lower = lingers longer)
       if (id === scene.id) {
         if (id === "intro") o = 1 - ramp(t, 0.55, 0.85);
         else if (id === "end") o = ramp(t, END.text[0], END.text[1]);
-        else o = ramp(t, 0.18, 0.3) * (1 - ramp(t, 0.62, 0.76));
+        else { const [a, b] = textRange(scene); o = ramp(t, a, a + 0.04) * (1 - ramp(t, b - 0.04, b)); }
       }
       el.style.opacity = o.toFixed(3);
       el.classList.toggle("is-on", o > 0.5);
