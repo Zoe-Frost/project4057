@@ -181,7 +181,20 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: radial-gradient(ellipse 90% 50% at 50% 35%, #2c4431 0%, #18261c 60%, #10170f 100%);
 }
 .map-panel[hidden] { display: none; }
-.map-page.has-selection .map-art { visibility: hidden; }   /* only one box shows at a time */
+/* Map: when a business is opened the map fades back and the info box reveals
+   itself (box grows in, then its parts drift up one by one); closing reverses it. */
+.map-art { transition: opacity .5s ease, transform .6s cubic-bezier(.16,.84,.3,1), visibility 0s; }
+.map-page.has-selection .map-art { opacity: 0; transform: scale(.97); visibility: hidden; pointer-events: none;
+  transition: opacity .4s ease, transform .5s ease, visibility 0s linear .4s; }   /* only one box shows at a time */
+.map-panel { opacity: 0; transform: translateY(18px) scale(.97); transition: opacity .35s ease, transform .4s ease; }
+.map-panel.is-in { opacity: 1; transform: none; transition: opacity .6s ease, transform .7s cubic-bezier(.16,.84,.3,1); }
+.map-panel .biz-block, .map-panel .biz-close { opacity: 0; transform: translateY(26px); filter: blur(5px);
+  transition: opacity .25s ease, transform .3s ease, filter .25s ease; }
+.map-panel.is-in .biz-block, .map-panel.is-in .biz-close { opacity: 1; transform: none; filter: none;
+  transition: opacity .8s ease, transform .9s cubic-bezier(.16,.84,.3,1), filter .8s ease; transition-delay: var(--d, 0s); }
+@media (prefers-reduced-motion: reduce) {
+  .map-art, .map-panel, .map-panel .biz-block, .map-panel .biz-close { transition: none !important; transform: none !important; filter: none !important; }
+}
 .biz { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: clamp(18px, 2.4vh, 30px); }
 /* The card is at least as tall as the map box and grows to fit, so it never scrolls; extra room is shared between its three parts */
 .biz-close { position: absolute; top: 0; right: 0; width: clamp(26px, calc(26px + 10 * (100vw - 360px) / 1080), 36px); height: clamp(26px, calc(26px + 10 * (100vw - 360px) / 1080), 36px); }

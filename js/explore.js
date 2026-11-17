@@ -12,6 +12,8 @@
      hold   : roughly where in the frames the text belongs (0–1, default 0.5)
      text   : optional [from, to] share of the scene the text stays up for (overrides hold)
      pauseBefore : scrolling (in scene lengths) spent on the first frame before the camera moves
+     speed  : optional, plays this scene faster (e.g. 1.35) or slower (e.g. 0.8) than the others
+     fastStart : optional [frames, times faster]: hurries through the first few frames (e.g. a slow camera start)
      Every scene plays at the same steady speed: its length is set from its
      number of frames (FRAMES_PER_UNIT below), so more frames = longer scene.
    ========================================================= */
@@ -27,7 +29,7 @@ const SCENES = [
   { id: "pie",       length: 6,   fogIn: false, fogOut: "black", hold: 0.67,
     seq: { dir: "../frames/room/", prefix: "frame_", start: 301, end: 700, pad: 4, ext: "webp" } },
   // Boardwalk (300 frames) flows straight into the final render (its frame 1 = boardwalk frame 300)
-  { id: "boardwalk", length: 3.5, fogIn: "black", fogOut: false,
+  { id: "boardwalk", length: 3.5, fogIn: "black", fogOut: false, speed: 1.35, fastStart: [45, 3],   // walks a bit quicker; the slow first 45 frames go by 3x quicker
     seq: { dir: "../frames/boardwalk/", prefix: "frame_", start: 1, end: 300, pad: 4, ext: "webp" } },
   // Final render, 1100 frames: e-waste fields (text ~frame 290), up Mauao (text ~frame 585),
   // over the top, dive into the ocean (~915-975) and rise to the final view of the Mount (~1087, then a short hold)
@@ -67,7 +69,11 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
     : { length: 1.6, blur: [0.12, 0.38], text: [0.28, 0.48], slow: 0.3 };
   SCENES.find((s) => s.id === "end").length = END.length;
   // Steady speed: each scene's scroll length comes from its number of frames.
-  SCENES.forEach((s) => { if (s.seq) s.length = (s.seq.end - s.seq.start + 1) / FRAMES_PER_UNIT + (s.pauseBefore || 0); });
+  const playFrames = (s) => {               // frames, counting any fastStart frames as fewer
+    const n = s.seq.end - s.seq.start + 1, f = s.fastStart;
+    return f ? n - f[0] + f[0] / f[1] : n;
+  };
+  SCENES.forEach((s) => { if (s.seq) s.length = playFrames(s) / FRAMES_PER_UNIT / (s.speed || 1) + (s.pauseBefore || 0); });
 
   const total = SCENES.reduce((s, sc) => s + sc.length, 0);
   let vh = window.innerHeight;
@@ -190,7 +196,12 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   // (pauseBefore keeps the first frame on screen for a moment first.)
   function holdEase(t, s) {
     const p = s && s.pauseBefore ? s.pauseBefore / s.length : 0;
-    return t <= p ? 0 : (t - p) / (1 - p);
+    const u = t <= p ? 0 : (t - p) / (1 - p);
+    if (!s || !s.fastStart || !s.seq) return u;
+    // fastStart: the first frames go by quicker, then normal speed
+    const [F, x] = s.fastStart, N = s.seq.end - s.seq.start;
+    const quick = F / x, time = u * (quick + (N - F));
+    return (time < quick ? time * x : F + (time - quick)) / N;
   }
   // The part of a scene (0–1) its text is on screen for.
   function textRange(s) {

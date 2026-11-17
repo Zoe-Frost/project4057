@@ -54,17 +54,24 @@ const BUSINESSES = {
           </div>
         </div>
       </article>`;
+    // Reveal: the box grows in and its parts drift up one after another
+    panel.querySelectorAll(".biz-block, .biz-close").forEach((el, i) => el.style.setProperty("--d", `${0.12 + i * 0.1}s`));
     panel.hidden = false;
+    panel.classList.remove("is-in");
+    void panel.offsetWidth;                       // start from the hidden state
+    requestAnimationFrame(() => panel.classList.add("is-in"));
     panel.querySelector(".biz-close").addEventListener("click", reset);
     page.classList.add("has-selection");
     markers.forEach((m) => m.classList.toggle("is-active", m.dataset.biz === id));
   }
 
   function reset() {
-    panel.hidden = true;
-    panel.innerHTML = "";
+    if (panel.hidden) return;
+    // Exit: the box fades away and the map comes back in its place
+    panel.classList.remove("is-in");
     page.classList.remove("has-selection");
     markers.forEach((m) => m.classList.remove("is-active"));
+    setTimeout(() => { if (!panel.classList.contains("is-in")) { panel.hidden = true; panel.innerHTML = ""; } }, 450);
   }
 
   markers.forEach((m) => m.addEventListener("click", (e) => { e.stopPropagation(); show(m.dataset.biz); }));
