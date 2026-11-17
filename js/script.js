@@ -329,6 +329,35 @@ function initPage2() {
   }, { threshold: [0, 0.15], rootMargin: "0px 0px -8% 0px" });
   watch.forEach((_, t) => io.observe(t));
 })();
+
+// Phones: after the experience (watched sideways), the map briefly asks to
+// turn the phone back upright. It goes as soon as the phone is turned, or
+// after 5 seconds, or when tapped.
+(() => {
+  if (!document.querySelector(".map-page")) return;
+  let fromExplore = false;
+  try { fromExplore = sessionStorage.getItem("4057-from-explore") === "1"; sessionStorage.removeItem("4057-from-explore"); } catch (e) {}
+  const phone = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
+  const sideways = window.matchMedia("(orientation: landscape)");
+  if (!fromExplore || !phone || !sideways.matches) return;
+  const note = document.createElement("div");
+  note.className = "rotate-back";
+  note.setAttribute("role", "status");
+  note.innerHTML = `
+    <svg viewBox="0 0 120 100" aria-hidden="true">
+      <rect x="6" y="48" width="92" height="46" rx="5" fill="none" stroke="#44D62C" stroke-width="2.5"/>
+      <rect x="66" y="4" width="46" height="88" rx="5" fill="#2fbf26"/>
+      <circle cx="89" cy="82" r="3.5" fill="#111"/>
+      <path d="M50 38c-14 0-24-9-26-24" fill="none" stroke="#44D62C" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M18 19l6-6 6 7" fill="none" stroke="#44D62C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p>Turn your phone back upright to explore the map</p>`;
+  document.body.appendChild(note);
+  const dismiss = () => { note.classList.add("is-dismissed"); setTimeout(() => note.remove(), 700); };
+  sideways.addEventListener("change", (e) => { if (!e.matches) dismiss(); });
+  note.addEventListener("click", dismiss);
+  setTimeout(dismiss, 5000);
+})();
 }
 
 window.__pageSignal = pageAbort.signal;   // from here on, listeners belong to this page
@@ -406,6 +435,9 @@ initPage(); initPage2();
   }
 
   window.__pageSignal = null;
+  document.addEventListener("click", (e) => {   // remember leaving the experience through its end button
+    if (e.target.closest && e.target.closest(".end-copy .btn")) { try { sessionStorage.setItem("4057-from-explore", "1"); } catch (err) {} }
+  }, true);
   document.addEventListener("click", (e) => {
     const a = e.target.closest && e.target.closest("a[href]");
     if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;

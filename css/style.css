@@ -267,7 +267,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hidden-field { position: absolute; left: -9999px; }
 .form-thanks { color: var(--green); font-size: var(--fs-body); font-weight: 300; line-height: 1.3; }
 
-.faqs { padding: 120px var(--gutter) 200px; }
+.faqs { padding: 120px var(--gutter) 280px; }   /* extra room before the footer */
 .faq-list { display: flex; flex-direction: column; margin-top: 40px; }
 .faq-list details { border-bottom: 1px solid #cfcfcf; }
 .faq-list summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
@@ -390,7 +390,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .contact-form .row { gap: 20px; }
   .contact-form input, .contact-form textarea { border-radius: 10px; padding: 10px 12px; font-size: 16px; }   /* 16px stops iPhones zooming in on tap */
   .contact-form textarea { min-height: 112px; }
-  .faqs { padding: 110px var(--gutter) 130px; }
+  .faqs { padding: 110px var(--gutter) 190px; }
   .faq-list .faq-small { order: -1; }          /* phone order: "Can I get my business..." second */
   .faq-list details:first-of-type { order: -2; }
   .footer { padding: 0 var(--gutter) calc(100px + env(safe-area-inset-bottom)); }   /* room so Safari's bottom bar never covers it */
@@ -439,6 +439,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 html:has(.about-page) { scroll-snap-type: y proximity; scroll-padding-top: var(--nav-h); }
 .about-page > section { scroll-snap-align: start; }
 html:has(.about-page) .footer { scroll-snap-align: end; }
+@media (min-width: 761px) { .about-row.story { scroll-snap-align: center; } }   /* Our story settles in the middle of the screen */
+@media (max-width: 760px) { .about-row.story { scroll-margin-top: -60px; } }   /* phones: Our story settles higher up, closer to the nav */
 @media (prefers-reduced-motion: reduce) {   /* "Reduce Motion" on: still fades in, just without sliding or zooming */
   .reveal, .reveal.about-img, .reveal.from-top:not(.is-in):not(.about-img),
   .values-list li.reveal, .faq-list details.reveal { transform: none !important; filter: none !important; clip-path: none !important; }
@@ -448,3 +450,14 @@ html:has(.about-page) .footer { scroll-snap-align: end; }
 .menu-btn:focus:not(:focus-visible), .menu-close:focus:not(:focus-visible), .sound-btn:focus:not(:focus-visible),
 .menu-list summary:focus:not(:focus-visible), .menu-setting:focus:not(:focus-visible) { outline: none; }
 .menu-btn, .menu-close, .sound-btn { -webkit-tap-highlight-color: transparent; }
+
+/* Phones: "turn your phone back upright" note shown on the map after the experience */
+.rotate-back {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  position: fixed; inset: 0; z-index: 60; padding: 0 var(--gutter); text-align: center;
+  background: radial-gradient(ellipse 85% 60% at 50% 50%, #33503a 0%, #1a2a1f 55%, #0b0f0b 100%);
+  transition: opacity .6s, visibility .6s;
+}
+.rotate-back.is-dismissed { opacity: 0; visibility: hidden; }
+.rotate-back svg { width: 96px; }
+.rotate-back p { font-size: 16px; font-weight: 300; }
