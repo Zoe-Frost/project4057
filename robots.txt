@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://proj4057.com/sitemap.xml
