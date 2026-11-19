@@ -300,7 +300,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .map-panel { min-height: 0; }
   .map-page.has-selection .map-panel { min-height: calc((50vw - var(--gutter) - 2.5vw) * 20 / 23); }
   .map-panel { padding: 44px 42px; }
-  .biz { gap: 36px; }
+  .biz { gap: 36px; justify-content: flex-start; }   /* the info stays together in order, top to bottom */
+  .biz-services { align-items: flex-end; }
   .biz .title { padding-top: 26px; }
   .biz-meta { margin-top: 14px; line-height: 1.6; }
   .biz p { margin-top: 14px; line-height: 1.6; }
@@ -329,6 +330,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .faqs { display: flex; flex-direction: column; justify-content: center; }
   .faq-list { margin-top: 56px; }
   .faq-list summary { padding: 28px 0 10px; }
+}
+
+/* Laptops and desktops (e.g. a MacBook at 1440-1512px wide): bigger, easier-to-read text.
+   Sizes keep growing a little on larger screens. Phones are unaffected. */
+@media (min-width: 1100px) {
+  :root {
+    --fs-xs: clamp(15px, 1.05vw, 17px);
+    --fs-sm: clamp(17px, 1.15vw, 19px);
+    --fs-body: clamp(20px, 1.38vw, 23px);
+    --fs-h3: clamp(24px, 1.65vw, 28px);
+    --fs-h2: clamp(38px, 2.6vw, 44px);
+    --fs-value: clamp(32px, 2.2vw, 38px);
+    --fs-num: clamp(42px, 2.9vw, 50px);
+    --fs-display: clamp(92px, 6.3vw, 112px);
+    --fs-nav: clamp(18px, 1.22vw, 20px);
+    --fs-faq: clamp(22px, 1.5vw, 26px);
+  }
+  .btn { font-size: 17px; padding: 10px 46px; }
+  .copy .body { font-size: clamp(22px, 1.5vw, 25px); }   /* Explore scene text */
+  .copy .title { font-size: var(--fs-h2); }
 }
 
 /* =========================================================
