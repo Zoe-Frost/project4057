@@ -93,7 +93,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       const first = lastW === 0;
       lastW = w;
       // Phones scroll much further per swipe, so each scene takes more swiping there.
-      vh = Math.max(window.innerHeight, document.documentElement.clientHeight) * (PHONE ? PHONE_SLOW : 1);
+      vh = Math.max(window.innerHeight, document.documentElement.clientHeight) * (PHONE ? PHONE_SLOW : COMPUTER_SCROLL);
       wrap.style.height = `${Math.round((total + 1) * vh)}px`;
       // Turning the phone changes the page size; keep the experience exactly
       // where it was instead of letting it skip to a different part.
@@ -120,6 +120,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   // phones stutter while they kept re-preparing them.
   const PHONE = window.matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
   const KEEP = PHONE ? 75 : Infinity;       // phones only hold the frames around where you are
+  const COMPUTER_SCROLL = 0.6;               // computers: each scene takes 40% less scrolling
   const PHONE_SLOW = 3;                     // phones: scenes take 3x more scrolling (raise to slow down more)
   const MAX_ACTIVE = PHONE ? 10 : 10;   // download several frames at once so phones keep up
   const cache = new Map(); // url -> { img, ok, done, started }
@@ -279,6 +280,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
   const TRAIL = PHONE ? 0.35 : 0.12;   // how far the scene glides on after you stop scrolling (in scene lengths); phones glide for longer
   const EASE = PHONE ? 0.3 : 0.15;     // how gradually it slows down at the end of a glide
   const PHONE_PACE = 1.45;      // phones play a little quicker
+  const COMPUTER_PACE = 1.4;    // computers play faster too, so a scroll moves you further
   let trailing = false;
   const MAX_LAG = PHONE ? 0.45 : 0.2;   // (must be more than TRAIL so there's something left to glide)          // how far the page may run ahead of the scene (in scene-lengths)
   let lastUserScroll = 0, setY = -1, ignoreScrollUntil = 0;
@@ -328,7 +330,7 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       stallSince = 0;
     }
     if (current !== null && current !== target) {
-      const pace = (textOnScreenAt(current) ? TEXT_PACE : PACE) * (PHONE ? PHONE_PACE : 1);
+      const pace = (textOnScreenAt(current) ? TEXT_PACE : PACE) * (PHONE ? PHONE_PACE : COMPUTER_PACE);
       const gap = target - current;
       let step = Math.sign(gap) * pace * dt;
       // ease in to a gentle stop over the last little bit
