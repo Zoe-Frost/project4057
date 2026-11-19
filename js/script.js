@@ -107,7 +107,18 @@ function initPage() {
     ctx.resume().then(() => { if (timer) schedule(); ready(); }, blocked);
     setTimeout(() => { if (on && ctx.state !== "running") blocked(); }, 600);
   }
-  document.addEventListener("visibilitychange", () => { if (!document.hidden && on) { if (timer) revive(); else play(); } });
+  document.addEventListener("visibilitychange", () => {
+    if (!on) return;
+    if (document.hidden) { if (timer && ctx) schedule(); }   // queue extra music before the tab goes to the background
+    else if (timer) revive(); else play();
+  });
+  // Safety net: every 2 seconds, if the sound is meant to be on but the browser has
+  // paused it, start it again (and keep the music queued).
+  setInterval(() => {
+    if (!on || !ctx || !buffer) return;
+    if (ctx.state !== "running") revive();
+    else if (timer) schedule();
+  }, 2000);
   window.addEventListener("pageshow", (e) => { if (e.persisted && on) revive(); });   // coming back with the Back button
 
   function load() {
@@ -122,7 +133,10 @@ function initPage() {
   }
 
   function schedule() {
-    while (nextAt < ctx.currentTime + 6) {     // passes are queued 6s ahead, so a busy page can't cause a gap
+    // Passes are queued ahead so a busy page can't cause a gap. In a background tab browsers only
+    // run timers about once a minute, so the music is queued 90 seconds ahead there.
+    const ahead = document.hidden ? 90 : 6;
+    while (nextAt < ctx.currentTime + ahead) {
       const s = ctx.createBufferSource();
       s.buffer = buffer;
       s.connect(gain);
