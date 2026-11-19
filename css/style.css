@@ -300,7 +300,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .map-panel { min-height: 0; }
   .map-page.has-selection .map-panel { min-height: calc((50vw - var(--gutter) - 2.5vw) * 20 / 23); }
   .map-panel { padding: 44px 42px; }
-  .biz { gap: 36px; justify-content: flex-start; }   /* the info stays together in order, top to bottom */
+  .biz { gap: 36px; justify-content: center; }   /* the info stays together and sits centred in the box */
+  .biz-block:last-child { margin-top: 30px; }   /* Services and Visit sit a little further down */
   .biz-services { align-items: flex-end; }
   .biz .title { padding-top: 26px; }
   .biz-meta { margin-top: 14px; line-height: 1.6; }
