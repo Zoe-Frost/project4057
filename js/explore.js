@@ -94,7 +94,8 @@ const TEXT_SPAN = [0.35, 0.6]; // text stays up from 35% of the scene before its
       lastW = w;
       // Phones scroll much further per swipe, so each scene takes more swiping there.
       vh = Math.max(window.innerHeight, document.documentElement.clientHeight) * (PHONE ? PHONE_SLOW : COMPUTER_SCROLL);
-      wrap.style.height = `${Math.round((total + 1) * vh)}px`;
+      // enough room to scroll through every scene, plus one screen for the last view to sit in
+      wrap.style.height = `${Math.round(total * vh + Math.max(window.innerHeight, document.documentElement.clientHeight))}px`;
       // Turning the phone changes the page size; keep the experience exactly
       // where it was instead of letting it skip to a different part.
       if (!first && current !== null) {

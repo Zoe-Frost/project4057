@@ -292,6 +292,45 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .footer-cols .footer-logo img { width: 120px; height: auto; }
 .copyright { text-align: center; margin-top: 30px; font-size: var(--fs-sm); color: var(--muted); }
 
+/* Computers (incl. Mac laptops with shorter screens): the map box keeps the
+   same shape at every screen size, so the whole map always shows, and the
+   business info gets more breathing room. */
+@media (min-width: 761px) {
+  .map-art { height: auto; min-height: 0; aspect-ratio: 23 / 20; }
+  .map-panel { min-height: 0; }
+  .map-page.has-selection .map-panel { min-height: calc((50vw - var(--gutter) - 2.5vw) * 20 / 23); }
+  .map-panel { padding: 44px 42px; }
+  .biz { gap: 36px; }
+  .biz .title { padding-top: 26px; }
+  .biz-meta { margin-top: 14px; line-height: 1.6; }
+  .biz p { margin-top: 14px; line-height: 1.6; }
+  .biz ul { line-height: 1.75; margin-top: 4px; }
+  .biz h3 { margin-bottom: 2px; }
+  .map-intro .body { margin-top: 18px; line-height: 1.45; }
+}
+
+/* Behind the scenes on computers: each section fills the whole screen with its
+   content centred, so only one set of info shows at a time, with lots of space. */
+@media (min-width: 761px) {
+  .about-page > section:not(.about-hero) {
+    min-height: 100vh; min-height: 100svh; box-sizing: border-box;
+    padding-top: calc(var(--nav-h) + 70px); padding-bottom: 90px;
+  }
+  .about-row, .values, .contact { align-content: center; }
+  .about-row { row-gap: 44px; column-gap: 9vw; }
+  .about-text p + p { margin-top: 30px; }
+  .about-text p { line-height: 1.45; }
+  .values { row-gap: 40px; }
+  .values-intro { line-height: 1.45; }
+  .values-list li { padding: 34px 0 14px; }
+  .contact { column-gap: 9vw; }
+  .contact-info p { margin-top: 18px; line-height: 1.45; }
+  .contact-form { gap: 20px; }
+  .faqs { display: flex; flex-direction: column; justify-content: center; }
+  .faq-list { margin-top: 56px; }
+  .faq-list summary { padding: 28px 0 10px; }
+}
+
 /* =========================================================
    Phones and small screens
    (portrait phones, and phones turned sideways)
